@@ -1,0 +1,24 @@
+modLoader="javafml"
+loaderVersion="[61,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="ruletita_panza"
+version="1.0.0"
+displayName="Ruletita - Panza"
+authors="Ruletita"
+description='''Dibuja la panza de los jugadores segun su nivel de hambre y grasa. Solo cliente. El servidor puede ser Vanilla.'''
+
+[[dependencies.ruletita_panza]]
+    modId="forge"
+    mandatory=true
+    versionRange="[61,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.ruletita_panza]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.21.11,1.22)"
+    ordering="NONE"
+    side="CLIENT"
