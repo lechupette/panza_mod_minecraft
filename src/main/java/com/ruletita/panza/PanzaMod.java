@@ -10,12 +10,12 @@ public class PanzaMod {
     public static final String MODID = "ruletita_panza";
 
     public PanzaMod(FMLJavaModLoadingContext context) {
-        EntityRenderersEvent.AddLayers.getBus(context.getModBusGroup()).addListener(PanzaMod::onAddLayers);
+        EntityRenderersEvent.AddLayers.BUS.addListener(PanzaMod::onAddLayers);
     }
 
     private static void onAddLayers(EntityRenderersEvent.AddLayers event) {
-        for (var skin : event.getSkins()) {
-            Object renderer = event.getSkin(skin);
+        for (var type : event.getModelTypes()) {
+            Object renderer = event.getPlayerRenderer(type);
             if (renderer instanceof AvatarRenderer<?> avatar) {
                 attach(avatar);
             }
