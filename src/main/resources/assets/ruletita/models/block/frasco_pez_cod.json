@@ -1,11 +1,12 @@
 {
+ "render_type": "minecraft:translucent",
  "textures": {
-  "glass": "ruletita:item/jar_glass",
-  "lid": "ruletita:item/jar_lid",
-  "particle": "ruletita:item/jar_glass",
-  "liquid": "ruletita:item/jar_liquid",
-  "fish": "ruletita:item/fish_cod",
-  "eye": "ruletita:item/fish_eye"
+  "glass": "ruletita:block/jar_glass",
+  "lid": "ruletita:block/jar_lid",
+  "particle": "ruletita:block/jar_glass",
+  "liquid": "ruletita:block/jar_liquid",
+  "fish": "ruletita:block/fish_cod",
+  "eye": "ruletita:block/fish_eye"
  },
  "elements": [
   {
