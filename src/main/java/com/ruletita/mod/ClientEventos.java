@@ -112,13 +112,13 @@ public final class ClientEventos {
         RenderState state = RENDER_STATES.get(player.getId());
         int fat = state == null ? 0 : state.fat;
 
-        int x = graphics.guiWidth() / 2 - 22;
-        int y = graphics.guiHeight() - 55;
-        graphics.drawString(minecraft.font, "R", x - 10, y - 1, 0xFFFFD34E, false);
+        int x = graphics.guiWidth() / 2 - 14;
+        int y = graphics.guiHeight() - 57;
+        graphics.drawString(minecraft.font, "RES", x - 24, y, 0xFFFFD34E, false);
         for (int i = 0; i < 5; i++) {
-            int left = x + i * 9;
-            graphics.fill(left, y, left + 7, y + 4, 0xFF29231A);
-            graphics.fill(left + 1, y + 1, left + 6, y + 3,
+            int left = x + i * 10;
+            graphics.fill(left, y - 1, left + 9, y + 7, 0xFF17130D);
+            graphics.fill(left + 1, y, left + 8, y + 6,
                     i < fat ? 0xFFFFD34E : 0xFF514B3E);
         }
     }
