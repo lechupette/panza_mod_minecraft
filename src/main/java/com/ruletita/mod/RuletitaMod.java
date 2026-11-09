@@ -50,6 +50,16 @@ public final class RuletitaMod {
         return item;
     }
 
+    private static RegistryObject<Item> jar(String name) {
+        RegistryObject<Block> block = BLOCKS.register(name, () -> new SpecimenJarBlock(
+                BlockBehaviour.Properties.of().setId(BLOCKS.key(name)).mapColor(MapColor.COLOR_LIGHT_GRAY)
+                        .strength(0.3f).noOcclusion()));
+        RegistryObject<Item> item = ITEMS.register(name,
+                () -> new BlockItem(block.get(), props(name).useItemDescriptionPrefix()));
+        LISTA.add(item);
+        return item;
+    }
+
     private static RegistryObject<Item> food(String name, int nutrition, float saturation, float seconds, int stack) {
         RegistryObject<Item> item = ITEMS.register(name, () -> new Item(props(name).stacksTo(stack)
                 .component(DataComponents.FOOD, new FoodProperties.Builder().alwaysEdible().nutrition(nutrition).saturationModifier(saturation).build())
@@ -79,14 +89,14 @@ public final class RuletitaMod {
             .component(DataComponents.CONSUMABLE, Consumable.builder().consumeSeconds(1.6f)
                     .animation(ItemUseAnimation.DRINK).sound(SoundEvents.GENERIC_DRINK).hasConsumeParticles(false).build())));
 
-    // ---- Frascos
+    // ---- Frascos de colección: bloques decorativos colocables y recuperables.
     public static final RegistryObject<Item> FORMOL = simple("formol", 16);
-    public static final RegistryObject<Item> FRASCO_VACIO = simple("frasco_vacio", 16);
-    public static final RegistryObject<Item> FRASCO_FORMOL = simple("frasco_formol", 16);
-    public static final RegistryObject<Item> FRASCO_PEZ_COD = simple("frasco_pez_cod", 16);
-    public static final RegistryObject<Item> FRASCO_PEZ_SALMON = simple("frasco_pez_salmon", 16);
-    public static final RegistryObject<Item> FRASCO_PEZ_TROPICAL = simple("frasco_pez_tropical", 16);
-    public static final RegistryObject<Item> FRASCO_PEZ_GLOBO = simple("frasco_pez_globo", 16);
+    public static final RegistryObject<Item> FRASCO_VACIO = jar("frasco_vacio");
+    public static final RegistryObject<Item> FRASCO_FORMOL = jar("frasco_formol");
+    public static final RegistryObject<Item> FRASCO_PEZ_COD = jar("frasco_pez_cod");
+    public static final RegistryObject<Item> FRASCO_PEZ_SALMON = jar("frasco_pez_salmon");
+    public static final RegistryObject<Item> FRASCO_PEZ_TROPICAL = jar("frasco_pez_tropical");
+    public static final RegistryObject<Item> FRASCO_PEZ_GLOBO = jar("frasco_pez_globo");
 
     public static final RegistryObject<SoundEvent> FART = SOUNDS.register("fart",
             () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(MODID, "fart")));
