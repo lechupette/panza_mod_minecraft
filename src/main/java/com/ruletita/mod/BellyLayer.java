@@ -15,7 +15,7 @@ import net.minecraft.resources.Identifier;
 
 /**
  * Panza delantera + nalgas. Conserva la geometria base y escala el volumen con 10 niveles
- * de alimentacion y 5 niveles de reserva. El equipo sincroniza el nivel con los clientes.
+ * de reserva de grasa. El hambre base no modifica este volumen adicional.
  */
 public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extends RenderLayer<AvatarRenderState, M> {
 
@@ -24,11 +24,11 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
     }
     @Override
     public void submit(PoseStack pose, SubmitNodeCollector collector, int light, AvatarRenderState state, float yRot, float xRot) {
-        float level = ClientEventos.smoothLevel(state.id);
-        if (level < 0.05f) return;
+        float fat = ClientEventos.smoothFat(state.id);
+        if (fat < 0.05f) return;
         Identifier skin = state.skin.body().texturePath();
         ModelPart body = this.getParentModel().root().getChild("body");
-        final float t = Math.min(level / 15f, 1f);
+        final float t = Math.min(fat / 5f, 1f);
         pose.pushPose();
         body.translateAndRotate(pose);
         collector.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(skin), (p, vc) -> draw(p, vc, light, t));
