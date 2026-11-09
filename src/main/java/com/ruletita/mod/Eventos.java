@@ -162,11 +162,17 @@ public final class Eventos {
             CompoundTag data = sp.getPersistentData();
             int hungerBefore = data.getIntOr("rz_food_before", -1);
             data.putInt("rz_food_before", -1);
-            // Los alimentos propios son siempre comestibles; al terminarse con la barra llena,
-            // cada unidad consumida aporta un nivel de reserva, hasta el limite de cinco.
-            if (hungerBefore >= 20) {
-                int fat = Math.min(MAX_GRASA, data.getIntOr("rz_grasa", 0) + 1);
-                data.putInt("rz_grasa", fat);
+            int hungerAfter = sp.getFoodData().getFoodLevel();
+            // Los alimentos del mod son siempre comestibles. Se comprueba el nivel previo y,
+            // como respaldo, el posterior por si otro mod omitió el evento Start.
+            boolean consumedWhileFull = hungerBefore >= 20
+                    || (hungerBefore < 0 && hungerAfter >= 20);
+            if (consumedWhileFull) {
+                int previousFat = data.getIntOr("rz_grasa", 0);
+                if (previousFat < MAX_GRASA) {
+                    data.putInt("rz_grasa", previousFat + 1);
+                    sp.displayClientMessage(Component.literal("Reserva corporal: " + (previousFat + 1) + " / " + MAX_GRASA), true);
+                }
             }
         }
     }
