@@ -1,14 +1,13 @@
 # Fuentes para la renovación visual
 
-Las texturas finales deben conservar la lectura de Minecraft: fotografías reales recortadas, reducidas a una resolución baja, cuantizadas a una paleta pequeña y convertidas a PNG con transparencia cuando corresponda. No usar ilustraciones generadas ni detalles decorativos que no se lean en el inventario.
+Las texturas se preparan con fotografías reales gratuitas de Pexels. El script `tools/prepare_stock_textures.py` descarga las fotos durante la compilación, las recorta al tamaño exacto de cada textura, reduce la paleta a 32 colores y conserva la máscara alfa original cuando existe. El juego solo carga PNG ya procesados: no descarga ni transforma imágenes en tiempo de ejecución.
 
-## Fotografías candidatas
+## Fotografías seleccionadas
 
-Todas las páginas de Pexels indican descarga gratuita. La licencia de Pexels permite uso personal y comercial gratuito; se conserva esta lista como registro de procedencia.
-
-| Recurso del mod | Fotografía | Autor |
+| Recurso | Foto Pexels | Autor |
 |---|---|---|
-| Taza / café servido | https://www.pexels.com/photo/white-ceramic-mug-with-coffee-4264049/ | Andrew Neel |
+| Taza / agua | https://www.pexels.com/photo/white-ceramic-mug-with-coffee-4264049/ | Andrew Neel |
+| Taza de café | https://www.pexels.com/photo/a-close-up-shot-of-a-cup-of-coffee-and-coffee-beans-3441194/ | Aleks Magnusson |
 | Pollo crudo | https://www.pexels.com/photo/fresh-raw-chicken-meat-with-rosemary-toppings-on-white-surface-5769376/ | Leeloo The First |
 | Pollo cocido | https://www.pexels.com/photo/fried-chicken-145804/ | freestocks.org |
 | Bacalao | https://www.pexels.com/photo/fish-on-white-background-19993441/ | Alex Bayev |
@@ -16,21 +15,23 @@ Todas las páginas de Pexels indican descarga gratuita. La licencia de Pexels pe
 | Pez globo | https://www.pexels.com/photo/close-up-of-a-blue-fugu-fish-5546939/ | Taryn Elliott |
 | Pez tropical | https://www.pexels.com/photo/vibrant-tropical-fish-in-a-lush-aquarium-35773832/ | Nguyễn Quang Vũ |
 | Planta / cerezas de café | https://www.pexels.com/photo/coffee-fruits-attached-to-the-shrubs-7125685/ | Michael Burrows |
-| Etapas de cerezas de café | https://www.pexels.com/photo/a-close-up-shot-of-a-coffea-plant-6152431/ | Sergiu Iacob |
+| Etapas de la planta | https://www.pexels.com/photo/a-close-up-shot-of-a-coffea-plant-6152431/ | Sergiu Iacob |
 | Café tostado | https://www.pexels.com/photo/a-close-up-shot-of-a-roasted-coffee-beans-34085/ | Negative Space |
+| Café tostado alternativo | https://www.pexels.com/photo/close-up-shot-of-a-cup-of-roasted-coffee-beans-14868344/ | Emrah |
+| Café molido | https://www.pexels.com/photo/close-up-shot-of-ground-coffee-14770390/ | Gergely Meszárcsek |
 
 Licencia: https://www.pexels.com/license/  
-Preguntas frecuentes de licencia: https://help.pexels.com/hc/en-us/articles/360042295174-What-is-the-license-of-the-photos-and-videos-on-Pexels
+Preguntas frecuentes: https://help.pexels.com/hc/en-us/articles/360042295174-What-is-the-license-of-the-photos-and-videos-on-Pexels
 
-## Tratamiento previsto
+## Rendimiento y tratamiento
 
-- Recortar el objeto principal, evitando fondos, manos, platos, marcas y texto.
-- Eliminar el fondo claro sin comerse bordes, aletas, asas ni detalles finos.
-- Reducir primero a 16×16 o 32×32 según el modelo y después ampliar con vecino más cercano para inspección.
-- Cuantizar colores para que la textura conserve contraste y no parezca una miniatura fotográfica borrosa.
-- Mantener separadas las capas de vidrio, tapa y líquido de los frascos; solo se sustituye la textura del espécimen.
-- Revisar cada textura en el inventario y en el modelo colocado antes de reemplazar la anterior.
+- Las fotos se descargan y procesan únicamente durante la compilación.
+- Cada PNG final mantiene las dimensiones de la textura original y una paleta de hasta 32 colores.
+- Se conserva la transparencia original para mantener las siluetas existentes.
+- No hay descargas, filtros, escalados ni procesamiento de imágenes durante el juego.
+- Se mantienen intactas las capas de vidrio, tapa, líquido y ojos de los frascos.
+- Si Pexels no responde durante una compilación, el script conserva las texturas existentes y permite que el mod compile.
 
 ## Estado
 
-Estas son fuentes seleccionadas, no texturas integradas. Las imágenes originales todavía deben estar disponibles como archivos para poder recortarlas y convertirlas sin inventar píxeles ni sustituirlas por dibujos aproximados.
+El pipeline está integrado en GitHub Actions y también puede ejecutarse localmente con Python y Pillow. La compilación empaqueta los PNG generados dentro del JAR.
