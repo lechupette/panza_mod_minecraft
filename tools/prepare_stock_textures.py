@@ -15,7 +15,7 @@ from PIL import Image, ImageStat
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "src/main/resources/assets/ruletita/textures"
-OUTPUT_SIZE = 64
+OUTPUT_SIZE = 64  # solo texturas de modelo (peces)
 PIXEL_SIZE = 16
 
 PHOTO_TARGETS = {
@@ -57,20 +57,71 @@ def download_photo(photo_id: int) -> bytes:
         return response.read()
 
 
-def prepare_photo(photo_bytes: bytes, target: Path) -> None:
-    with Image.open(BytesIO(photo_bytes)) as source:
+FISH_TARGETS = {"item/fish_cod.png", "item/fish_salmon.png", "item/fish_globo.png", "item/fish_tropical.png"}
+
+
+def _remove_background(img: Image.Image, work: int = 160, tolerance: int = 48) -> Image.Image:
+    """Return RGBA where the border-connected background (flood fill) is transparent."""
+    from collections import deque
+    small = img.resize((work, work), Image.Resampling.BILINEAR)
+    px = small.load()
+    border = [px[x, 0] for x in range(work)] + [px[x, work - 1] for x in range(work)] \
+        + [px[0, y] for y in range(work)] + [px[work - 1, y] for y in range(work)]
+    bg = tuple(sorted(c[i] for c in border)[len(border) // 2] for i in range(3))
+
+    def close(c):
+        return sum(abs(c[i] - bg[i]) for i in range(3)) <= tolerance * 3 // 2
+
+    seen = [[False] * work for _ in range(work)]
+    queue = deque()
+    for x in range(work):
+        queue.extend(((x, 0), (x, work - 1)))
+    for y in range(work):
+        queue.extend(((0, y), (work - 1, y)))
+    while queue:
+        x, y = queue.popleft()
+        if not (0 <= x < work and 0 <= y < work) or seen[y][x] or not close(px[x, y]):
+            continue
+        seen[y][x] = True
+        queue.extend(((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
+    mask = Image.new("L", (work, work), 255)
+    mp = mask.load()
+    for y in range(work):
+        for x in range(work):
+            if seen[y][x]:
+                mp[x, y] = 0
+    mask = mask.resize(img.size, Image.Resampling.BILINEAR)
+    out = img.convert("RGBA")
+    out.putalpha(mask.point(lambda v: 255 if v > 127 else 0))
+    return out
+
+
+def prepare_photo(photo_bytes: bytes, target: Path, relative: str = "") -> None:
+    with Image.open(photo_bytes if hasattr(photo_bytes, "read") else BytesIO(photo_bytes)) as source:
         photo = source.convert("RGB")
-        # Contain the complete source; do not crop the subject or reuse the
-        # former icon's alpha silhouette. Pad with the photo's average tone.
-        photo.thumbnail((PIXEL_SIZE, PIXEL_SIZE), Image.Resampling.LANCZOS)
-        average = tuple(int(v) for v in ImageStat.Stat(photo).mean[:3])
-        square = Image.new("RGB", (PIXEL_SIZE, PIXEL_SIZE), average)
-        x = (PIXEL_SIZE - photo.width) // 2
-        y = (PIXEL_SIZE - photo.height) // 2
-        square.paste(photo, (x, y))
-        # Each pixel becomes a crisp 4x4 block, yielding an opaque 64x64 PNG.
-        square = square.resize((OUTPUT_SIZE, OUTPUT_SIZE), Image.Resampling.NEAREST)
-        square.save(target, format="PNG", optimize=True)
+        if relative in FISH_TARGETS:
+            # Model textures: keep opaque, centered crop, light pixelation (details stay readable).
+            side = min(photo.size)
+            left, top = (photo.width - side) // 2, (photo.height - side) // 2
+            photo = photo.crop((left, top, left + side, top + side))
+            photo = photo.resize((PIXEL_SIZE, PIXEL_SIZE), Image.Resampling.LANCZOS)
+            photo.resize((OUTPUT_SIZE, OUTPUT_SIZE), Image.Resampling.NEAREST).save(target, format="PNG", optimize=True)
+            return
+        # Inventory items: plain PNG with transparent background, subject cropped and centred.
+        rgba = _remove_background(photo)
+        box = rgba.getchannel("A").getbbox()
+        if box:
+            rgba = rgba.crop(box)
+        side = max(rgba.size)
+        square = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+        square.paste(rgba, ((side - rgba.width) // 2, (side - rgba.height) // 2))
+        inner = PIXEL_SIZE - 2  # 1 px margin like vanilla items
+        rgb = square.convert("RGB").resize((inner, inner), Image.Resampling.LANCZOS)
+        alpha = square.getchannel("A").resize((inner, inner), Image.Resampling.BOX).point(lambda v: 255 if v > 127 else 0)
+        rgb.putalpha(alpha)
+        final = Image.new("RGBA", (PIXEL_SIZE, PIXEL_SIZE), (0, 0, 0, 0))
+        final.paste(rgb, (1, 1))
+        final.save(target, format="PNG", optimize=True)
 
 
 def make_block_atlas_aliases() -> None:
@@ -100,7 +151,7 @@ def main() -> None:
             target = ASSETS / relative
             if not target.is_file():
                 raise FileNotFoundError(f"Texture target missing: {target}")
-            prepare_photo(data, target)
+            prepare_photo(data, target, relative)
             changed += 1
             print(f"Prepared Pexels photo {photo_id} -> {relative}")
 

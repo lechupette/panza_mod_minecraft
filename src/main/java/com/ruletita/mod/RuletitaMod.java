@@ -23,6 +23,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -126,6 +127,7 @@ public final class RuletitaMod {
         TickEvent.PlayerTickEvent.Post.BUS.addListener(Eventos::onPlayerTick);
         LivingEntityUseItemEvent.Start.BUS.addListener(Eventos::onUseStart);
         LivingEntityUseItemEvent.Finish.BUS.addListener(Eventos::onUseFinish);
+        PlayerInteractEvent.RightClickItem.BUS.addListener(Eventos::onRightClickItem);
         PlayerSleepInBedEvent.BUS.addListener(Eventos::onSleep);
     }
 }

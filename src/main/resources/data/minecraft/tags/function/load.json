@@ -1,5 +1,6 @@
 {
  "values": [
-  "kuadro:load"
+  "kuadro:load",
+  "panza:load"
  ]
 }

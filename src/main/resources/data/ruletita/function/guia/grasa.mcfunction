@@ -10,5 +10,5 @@ tellraw @s {text:"        [ TORSO ]  →  ABDOMEN",color:"yellow"}
 tellraw @s {text:"        [ CINTURA ] → ZONA POSTERIOR",color:"yellow"}
 tellraw @s {text:"El volumen adicional se manifiesta en el abdomen y la zona posterior. Observe los segmentos de reserva para conocer su nivel actual.",color:"white"}
 tellraw @s {text:"RECOMENDACIÓN: evite consumir alimentos en exceso de manera continua.",color:"gray",italic:true}
-tellraw @s ["",{text:"[VOLVER AL ÍNDICE]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"function ruletita:guia"}}]
+tellraw @s ["",{text:"[VOLVER AL ÍNDICE]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}}]
 tellraw @s {text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}

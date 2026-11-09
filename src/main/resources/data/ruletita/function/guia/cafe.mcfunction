@@ -8,5 +8,5 @@ tellraw @s {text:"FIG. 05 / EFECTOS REGISTRADOS",color:"gray",bold:true}
 tellraw @s {text:"VELOCIDAD  +  SALTO MEJORADO  +  PRISA",color:"yellow"}
 tellraw @s {text:"El café proporciona temporalmente velocidad, salto mejorado y prisa minera. Su consumo durante la noche puede provocar insomnio e impedir el descanso hasta el amanecer.",color:"white"}
 tellraw @s {text:"RECOMENDACIÓN: reserve la bebida para las horas de actividad.",color:"gray",italic:true}
-tellraw @s ["",{text:"[VOLVER AL ÍNDICE]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"function ruletita:guia"}}]
+tellraw @s ["",{text:"[VOLVER AL ÍNDICE]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}}]
 tellraw @s {text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}

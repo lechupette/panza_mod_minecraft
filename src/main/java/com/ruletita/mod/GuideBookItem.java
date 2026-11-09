@@ -16,8 +16,11 @@ public final class GuideBookItem extends Item {
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer && level.getServer() != null) {
+            // Fuente del servidor con el jugador como entidad: no exige permisos de operador.
             level.getServer().getCommands().performPrefixedCommand(
-                    serverPlayer.createCommandSourceStack(), "function panza:guia");
+                    level.getServer().createCommandSourceStack()
+                            .withEntity(serverPlayer).withPosition(serverPlayer.position()),
+                    "function panza:guia");
         }
         return InteractionResult.SUCCESS;
     }

@@ -7,5 +7,5 @@ tellraw @s {text:"Correr, saltar, recibir daño y otras actividades pueden consu
 tellraw @s {text:"ESQUEMA / 0–20 PUNTOS",color:"gray",bold:true}
 tellraw @s {text:"VACÍO  ───────────────  SACIADO",color:"yellow"}
 tellraw @s {text:"0                         10                         20",color:"gray"}
-tellraw @s ["",{text:"[VOLVER AL ÍNDICE]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"function ruletita:guia"}}]
+tellraw @s ["",{text:"[VOLVER AL ÍNDICE]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}}]
 tellraw @s {text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}

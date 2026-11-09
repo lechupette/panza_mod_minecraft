@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,6 +25,7 @@ import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 
 /** Logica de servidor: alimentacion, reserva corporal, cafe, insomnio y comandos de prueba. */
@@ -136,6 +138,21 @@ public final class Eventos {
         PlayerTeam team = scoreboard.getPlayerTeam(name);
         if (team == null) team = scoreboard.addPlayerTeam(name);
         scoreboard.addPlayerToTeam(sp.getScoreboardName(), team);
+    }
+
+    /**
+     * Permite empezar a comer cualquier alimento con la barra de hambre llena (vanilla lo impide).
+     * Solo en servidor; los alimentos "siempre comestibles" siguen el camino normal.
+     */
+    public static boolean onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if (!(event.getEntity() instanceof ServerPlayer sp)) return false;
+        ItemStack stack = event.getItemStack();
+        var food = stack.get(DataComponents.FOOD);
+        if (food == null || stack.get(DataComponents.CONSUMABLE) == null) return false;
+        if (food.canAlwaysEat() || sp.isUsingItem() || sp.getFoodData().getFoodLevel() < 20) return false;
+        sp.startUsingItem(event.getHand());
+        event.setCancellationResult(InteractionResult.CONSUME);
+        return true;
     }
 
     public static void onUseStart(LivingEntityUseItemEvent.Start event) {
