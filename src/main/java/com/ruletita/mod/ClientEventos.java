@@ -58,7 +58,6 @@ public final class ClientEventos {
         if (level == null) return;
 
         for (Player player : level.players()) {
-            int targetLevel = 0;
             int fat = 0;
             Team team = player.getTeam();
             if (team != null) {
@@ -66,13 +65,11 @@ public final class ClientEventos {
                 if (name.startsWith("rzb")) {
                     int separator = name.indexOf('f', 3);
                     try {
-                        targetLevel = Math.max(0, Math.min(15, Integer.parseInt(
-                                separator >= 0 ? name.substring(3, separator) : name.substring(3))));
+                        if (separator < 0) Integer.parseInt(name.substring(3));
                         if (separator >= 0) {
                             fat = Math.max(0, Math.min(5, Integer.parseInt(name.substring(separator + 1))));
                         }
                     } catch (NumberFormatException ignored) {
-                        targetLevel = 0;
                         fat = 0;
                     }
                 }
@@ -80,7 +77,7 @@ public final class ClientEventos {
 
             RenderState state = RENDER_STATES.get(player.getId());
             if (state == null) {
-                state = new RenderState(targetLevel);
+                state = new RenderState();
                 RENDER_STATES.put(player.getId(), state);
             }
             state.targetFat = fat;
@@ -132,7 +129,7 @@ public final class ClientEventos {
         private int fat;
         private long lastNanos;
 
-        private RenderState(int initialLevel) {
+        private RenderState() {
             this.currentFat = 0f;
             this.targetFat = 0;
         }
