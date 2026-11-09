@@ -1,6 +1,6 @@
 # Fuentes para la renovación visual
 
-Las texturas se preparan con fotografías reales gratuitas de Pexels. El script `tools/prepare_stock_textures.py` descarga las fotos durante la compilación, las recorta al tamaño exacto de cada textura, reduce la paleta a 32 colores y conserva la máscara alfa original cuando existe. El juego solo carga PNG ya procesados: no descarga ni transforma imágenes en tiempo de ejecución.
+Las texturas fotográficas usan imágenes gratuitas de Pexels. El proceso se ejecuta únicamente durante la compilación; el juego carga los PNG incluidos en el JAR.
 
 ## Fotografías seleccionadas
 
@@ -23,15 +23,11 @@ Las texturas se preparan con fotografías reales gratuitas de Pexels. El script 
 Licencia: https://www.pexels.com/license/  
 Preguntas frecuentes: https://help.pexels.com/hc/en-us/articles/360042295174-What-is-the-license-of-the-photos-and-videos-on-Pexels
 
-## Rendimiento y tratamiento
+## Tratamiento y compatibilidad
 
-- Las fotos se descargan y procesan únicamente durante la compilación.
-- Cada PNG final mantiene las dimensiones de la textura original y una paleta de hasta 32 colores.
-- Se conserva la transparencia original para mantener las siluetas existentes.
-- No hay descargas, filtros, escalados ni procesamiento de imágenes durante el juego.
-- Se mantienen intactas las capas de vidrio, tapa, líquido y ojos de los frascos.
-- Si Pexels no responde durante una compilación, el script conserva las texturas existentes y permite que el mod compile.
-
-## Estado
-
-El pipeline está integrado en GitHub Actions y también puede ejecutarse localmente con Python y Pillow. La compilación empaqueta los PNG generados dentro del JAR.
+- Las fotografías se preparan durante la compilación, nunca dentro del juego.
+- Se conserva la proporción completa de cada fotografía; no se recorta agresivamente.
+- Las texturas finales se amplían a 64 × 64 y conservan la máscara alfa original mediante escalado por vecino más cercano.
+- El detalle fotográfico se mantiene moderadamente pixelado para integrarse con Minecraft.
+- Los modelos de frascos colocados usan el atlas de bloques. El pipeline genera copias de las texturas compartidas de frascos y peces en `textures/block`; los modelos de inventario siguen usando `textures/item`.
+- Si una fuente externa falla, se conserva la textura incluida en el repositorio. La compilación no descarga ni procesa imágenes durante el juego.
