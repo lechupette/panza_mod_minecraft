@@ -32,10 +32,14 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Configurar Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "9.5.0"
+      - name: Instalar Gradle 9.5.0
+        run: |
+          curl --retry 5 --retry-all-errors --retry-delay 5 -fL \
+            https://downloads.gradle.org/distributions/gradle-9.5.0-bin.zip \
+            -o "$RUNNER_TEMP/gradle-9.5.0-bin.zip"
+          unzip -q "$RUNNER_TEMP/gradle-9.5.0-bin.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-9.5.0/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/gradle-9.5.0/bin/gradle" --version
 
       - name: Compilar mod
         run: gradle build --no-daemon --stacktrace
