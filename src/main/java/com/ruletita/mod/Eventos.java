@@ -76,12 +76,7 @@ public final class Eventos {
             }
         }
 
-        // --- barra de grasa (3 muslos = 6 puntos) en la action bar
-        if (grasa > 0 && sp.tickCount % 20 == 0) {
-            StringBuilder sb = new StringBuilder("Grasa ");
-            for (int i = 0; i < MAX_GRASA; i++) sb.append(i < grasa ? "\u25A0" : "\u25A1");
-            sp.displayClientMessage(Component.literal(sb.toString()), true);
-        }
+        // La reserva no usa la action bar: el indicador se dibuja en el HUD del cliente.
     }
 
     private static void flatulencia(ServerPlayer sp) {
