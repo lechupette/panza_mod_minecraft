@@ -90,6 +90,9 @@ public final class RuletitaMod {
                     .animation(ItemUseAnimation.DRINK).sound(SoundEvents.GENERIC_DRINK).hasConsumeParticles(false).build())));
 
     // ---- Frascos de colección: bloques decorativos colocables y recuperables.
+    public static final RegistryObject<Item> GUIA_ESTUDIANTE = ITEMS.register("guia_estudiante",
+            () -> new GuideBookItem(props("guia_estudiante").stacksTo(1)));
+    static { LISTA.add(GUIA_ESTUDIANTE); }
     public static final RegistryObject<Item> FORMOL = simple("formol", 16);
     public static final RegistryObject<Item> FRASCO_VACIO = jar("frasco_vacio");
     public static final RegistryObject<Item> FRASCO_FORMOL = jar("frasco_formol");
