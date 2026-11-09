@@ -1,0 +1,28 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  "minecraft:stick",
+  "minecraft:stick",
+  "minecraft:stick",
+  "minecraft:stick",
+  "minecraft:stick",
+  "minecraft:stick",
+  "minecraft:stick",
+  "#minecraft:wool",
+  "#minecraft:meat"
+ ],
+ "result": {
+  "id": "minecraft:painting",
+  "count": 1,
+  "components": {
+   "minecraft:custom_data": {
+    "kuadro": 1
+   },
+   "minecraft:item_name": {
+    "text": "Kuadro 1x1"
+   },
+   "minecraft:painting/variant": "kuadro:k_1x1"
+  }
+ }
+}

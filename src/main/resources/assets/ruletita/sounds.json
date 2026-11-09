@@ -1,0 +1,10 @@
+{
+ "fart": {
+  "subtitle": "subtitles.ruletita.fart",
+  "sounds": [
+   "ruletita:fart1",
+   "ruletita:fart2",
+   "ruletita:fart3"
+  ]
+ }
+}

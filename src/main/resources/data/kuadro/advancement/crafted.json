@@ -1,0 +1,13 @@
+{
+ "criteria": {
+  "c": {
+   "trigger": "minecraft:recipe_crafted",
+   "conditions": {
+    "recipe_id": "kuadro:kuadro_1x1"
+   }
+  }
+ },
+ "rewards": {
+  "function": "kuadro:crafted"
+ }
+}

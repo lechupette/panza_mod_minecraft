@@ -1,0 +1,13 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  "minecraft:water_bucket",
+  "minecraft:gunpowder",
+  "minecraft:gunpowder"
+ ],
+ "result": {
+  "id": "ruletita:formol",
+  "count": 4
+ }
+}

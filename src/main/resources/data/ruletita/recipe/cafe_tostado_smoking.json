@@ -1,0 +1,10 @@
+{
+ "type": "minecraft:smoking",
+ "category": "food",
+ "ingredient": "ruletita:cerezas_cafe",
+ "result": {
+  "id": "ruletita:cafe_tostado"
+ },
+ "experience": 0.1,
+ "cookingtime": 100
+}
