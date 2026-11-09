@@ -1,5 +1,5 @@
 {
- "render_type": "minecraft:translucent",
+ "render_type": "minecraft:translucent_moving_block",
  "textures": {
   "glass": "ruletita:block/jar_glass",
   "lid": "ruletita:block/jar_lid",

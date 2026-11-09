@@ -101,6 +101,20 @@ public final class Eventos {
 
         if (sp.level().getDayTime() % 24000L < 12000L) d.putBoolean("rz_insomnio", false);
 
+        // Comer con la barra llena: vanilla no lo permite. Mientras se sostiene comida con hambre 20,
+        // se baja un punto el nivel para habilitar el consumo y se marca para contarlo como exceso.
+        boolean holdingFood = esComidaNormal(sp.getMainHandItem()) || esComidaNormal(sp.getOffhandItem());
+        boolean lleno = d.getBooleanOr("rz_lleno", false);
+        if (!lleno && holdingFood && food >= 20 && !sp.isCreative() && !sp.isSpectator()) {
+            sp.getFoodData().setFoodLevel(19);
+            d.putBoolean("rz_lleno", true);
+            food = 19;
+        } else if (lleno && !sp.isUsingItem() && !holdingFood) {
+            if (sp.getFoodData().getFoodLevel() == 19) sp.getFoodData().setFoodLevel(20);
+            d.putBoolean("rz_lleno", false);
+            food = sp.getFoodData().getFoodLevel();
+        }
+
         // Diez niveles de hambre nativa más cinco niveles independientes de reserva.
         int alimentacion = food / 2;
         int nivel = Math.max(0, Math.min(10, alimentacion)) + grasa;
@@ -116,7 +130,7 @@ public final class Eventos {
             if (inst != null) {
                 inst.removeModifier(MOD_VELOCIDAD);
                 if (grasa > 0) {
-                    inst.addPermanentModifier(new AttributeModifier(MOD_VELOCIDAD, -0.03 * grasa, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                    inst.addPermanentModifier(new AttributeModifier(MOD_VELOCIDAD, -0.05 * grasa, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                 }
             }
         }
@@ -144,6 +158,11 @@ public final class Eventos {
      * Permite empezar a comer cualquier alimento con la barra de hambre llena (vanilla lo impide).
      * Solo en servidor; los alimentos "siempre comestibles" siguen el camino normal.
      */
+    private static boolean esComidaNormal(ItemStack stack) {
+        var food = stack.get(DataComponents.FOOD);
+        return food != null && !food.canAlwaysEat() && stack.get(DataComponents.CONSUMABLE) != null;
+    }
+
     public static boolean onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if (!(event.getEntity() instanceof ServerPlayer sp)) return false;
         ItemStack stack = event.getItemStack();
@@ -182,8 +201,9 @@ public final class Eventos {
             int hungerAfter = sp.getFoodData().getFoodLevel();
             // Los alimentos del mod son siempre comestibles. Se comprueba el nivel previo y,
             // como respaldo, el posterior por si otro mod omitió el evento Start.
-            boolean consumedWhileFull = hungerBefore >= 20
+            boolean consumedWhileFull = data.getBooleanOr("rz_lleno", false) || hungerBefore >= 20
                     || (hungerBefore < 0 && hungerAfter >= 20);
+            data.putBoolean("rz_lleno", false);
             if (consumedWhileFull) {
                 int previousFat = data.getIntOr("rz_grasa", 0);
                 if (previousFat < MAX_GRASA) {

@@ -1,14 +1,26 @@
-tellraw @s {text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}
-tellraw @s {text:"LÁMINA 01 · ALIMENTACIÓN Y RESERVAS CORPORALES",color:"gold",bold:true}
-tellraw @s {text:"FIG. 01 / ESCALA DE VOLUMEN CORPORAL",color:"gray",bold:true}
-tellraw @s ["",{text:"ALIMENTACIÓN  ",color:"white"},{text:"□□□□□□□□□□",color:"gray"},{text:"  RESERVA  ",color:"yellow"},{text:"□□□□□",color:"gold"}]
-tellraw @s {text:"La barra de alimentación contiene diez niveles. La reserva corporal dispone de cinco niveles adicionales, indicados por segmentos amarillos.",color:"white"}
-tellraw @s {text:"La reserva aumenta al consumir alimentos cuando la barra de alimentación ya está completa. Los alimentos preparados en este programa pueden consumirse aun estando saciado.",color:"white"}
-tellraw @s {text:"La reserva disminuye gradualmente con el paso del tiempo. Cada nivel acumulado puede reducir ligeramente la velocidad de movimiento.",color:"white"}
-tellraw @s {text:"FIG. 02 / DISTRIBUCIÓN DEL VOLUMEN",color:"gray",bold:true}
-tellraw @s {text:"        [ TORSO ]  →  ABDOMEN",color:"yellow"}
-tellraw @s {text:"        [ CINTURA ] → ZONA POSTERIOR",color:"yellow"}
-tellraw @s {text:"El volumen adicional se manifiesta en el abdomen y la zona posterior. Observe los segmentos de reserva para conocer su nivel actual.",color:"white"}
-tellraw @s {text:"RECOMENDACIÓN: evite consumir alimentos en exceso de manera continua.",color:"gray",italic:true}
-tellraw @s ["",{text:"[VOLVER AL ÍNDICE]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}}]
-tellraw @s {text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}
+tellraw @s ["",{text:"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",color:"dark_gray"}]
+tellraw @s ["",{text:"  LÁMINA 01 · CUADERNO DE CIENCIAS DEL CUERPO",color:"gray",italic:true}]
+tellraw @s ["",{text:"  ✦ ALIMENTACIÓN Y RESERVAS CORPORALES",color:"gold",bold:true}]
+tellraw @s ["",{text:"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛",color:"dark_gray"}]
+tellraw @s ["",{text:" FIG. 1 ",color:"gold",bold:true},{text:"· Dos escalas, un solo cuerpo",color:"yellow",bold:true}]
+tellraw @s ["",{text:"   Alimentación  ",color:"white"},{text:"▮▮▮▮▮▮▮▮▮▮",color:"red"},{text:"   10 niveles",color:"gray"}]
+tellraw @s ["",{text:"   Reserva       ",color:"yellow"},{text:"▮▮▮▮▮",color:"gold"},{text:"   5 niveles amarillos",color:"gray"}]
+tellraw @s ["",{text:"   Los segmentos amarillos se dibujan sobre la barra de alimentación.",color:"gray"}]
+tellraw @s ""
+tellraw @s ["",{text:" FIG. 2 ",color:"gold",bold:true},{text:"· Cómo se acumula",color:"yellow",bold:true}]
+tellraw @s ["",{text:"   Al consumir un alimento con la barra completa, la reserva sube un nivel.",color:"white"}]
+tellraw @s ["",{text:"   Con el paso del tiempo la reserva disminuye de forma gradual.",color:"white"}]
+tellraw @s ""
+tellraw @s ["",{text:" FIG. 3 ",color:"gold",bold:true},{text:"· Volumen según la reserva",color:"yellow",bold:true}]
+tellraw @s ["",{text:"   0  ",color:"gold",bold:true},{text:"▯▯▯▯▯",color:"gold"},{text:"  Silueta normal",color:"white"}]
+tellraw @s ["",{text:"   1  ",color:"gold",bold:true},{text:"▮▯▯▯▯",color:"gold"},{text:"  Leve redondez en abdomen y zona posterior",color:"white"}]
+tellraw @s ["",{text:"   2  ",color:"gold",bold:true},{text:"▮▮▯▯▯",color:"gold"},{text:"  Volumen moderado",color:"white"}]
+tellraw @s ["",{text:"   3  ",color:"gold",bold:true},{text:"▮▮▮▯▯",color:"gold"},{text:"  Prominencia clara",color:"white"}]
+tellraw @s ["",{text:"   4  ",color:"gold",bold:true},{text:"▮▮▮▮▯",color:"gold"},{text:"  Volumen muy evidente",color:"white"}]
+tellraw @s ["",{text:"   5  ",color:"gold",bold:true},{text:"▮▮▮▮▮",color:"gold"},{text:"  Volumen máximo",color:"white"}]
+tellraw @s ""
+tellraw @s ["",{text:" FIG. 4 ",color:"gold",bold:true},{text:"· Movimiento",color:"yellow",bold:true}]
+tellraw @s ["",{text:"   Cada nivel acumulado reduce la velocidad de marcha en un 5 %.",color:"white"}]
+tellraw @s ["",{text:"   RECOMENDACIÓN: ",color:"gold",bold:true},{text:"evite el exceso continuado de alimentos.",color:"gray",italic:true}]
+tellraw @s ["",{text:"            ",color:"white"},{text:"   ",color:"white"},{text:"[Índice]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}},{text:"   ",color:"white"},{text:"[Siguiente ▶]",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 12"}}]
+tellraw @s ["",{text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}]

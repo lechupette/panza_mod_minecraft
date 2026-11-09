@@ -100,7 +100,7 @@ public final class ClientEventos {
 
     private static void addHudLayer(AddGuiOverlayLayersEvent event) {
         Identifier name = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "fat_reserve");
-        event.getLayeredDraw().add(ForgeLayeredDraw.HOTBAR_AND_DECOS, name, ClientEventos::renderFatReserve);
+        event.getLayeredDraw().add(ForgeLayeredDraw.PRE_SLEEP_STACK, name, ClientEventos::renderFatReserve);
     }
 
     /**
@@ -110,19 +110,21 @@ public final class ClientEventos {
     private static void renderFatReserve(GuiGraphics graphics, DeltaTracker delta) {
         Minecraft minecraft = Minecraft.getInstance();
         Player player = minecraft.player;
-        if (player == null || minecraft.screen != null || minecraft.gameMode == null || minecraft.gameMode.isSpectator()) return;
+        if (player == null || minecraft.options.hideGui || minecraft.gameMode == null
+                || !minecraft.gameMode.canHurtPlayer()) return;
 
         RenderState state = RENDER_STATES.get(player.getId());
         int fat = state == null ? 0 : state.fat;
 
+        // Sobrebarra: justo encima de la barra de hambre nativa (que ocupa x+10..x+91, y = alto-39).
         int x = graphics.guiWidth() / 2 + 10;
-        int y = graphics.guiHeight() - 30;
-        graphics.drawString(minecraft.font, "R", x - 9, y - 1, 0xFFFFD34E, false);
+        int y = graphics.guiHeight() - 39 - 7;
         for (int i = 0; i < 5; i++) {
-            int left = x + i * 9;
-            graphics.fill(left, y, left + 8, y + 6, 0xFF17130D);
-            graphics.fill(left + 1, y + 1, left + 7, y + 5,
-                    i < fat ? 0xFFFFD34E : 0xFF514B3E);
+            int left = x + i * 16;
+            boolean full = i < fat;
+            graphics.fill(left, y, left + 15, y + 5, 0xFF2B2415);
+            graphics.fill(left + 1, y + 1, left + 14, y + 4, full ? 0xFFE6B422 : 0xFF4A4332);
+            if (full) graphics.fill(left + 1, y + 1, left + 14, y + 2, 0xFFFBE27A);
         }
     }
 

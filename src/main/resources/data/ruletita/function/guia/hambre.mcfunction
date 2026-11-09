@@ -1,11 +1,18 @@
-tellraw @s {text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}
-tellraw @s {text:"LÁMINA 02 · ESCALA DE HAMBRE Y SACIEDAD",color:"gold",bold:true}
-tellraw @s {text:"FIG. 03 / RELACIÓN ENTRE ICONOS Y PUNTOS",color:"gray",bold:true}
-tellraw @s {text:"Cada icono de hambre representa dos puntos de alimentación. La barra completa contiene veinte puntos y diez niveles.",color:"white"}
-tellraw @s {text:"La alimentación regula el volumen corporal de base. Los segmentos amarillos corresponden a la reserva adicional y se cuentan por separado.",color:"white"}
-tellraw @s {text:"Correr, saltar, recibir daño y otras actividades pueden consumir saturación o alimentación. Reponga sus fuerzas antes de emprender viajes prolongados.",color:"white"}
-tellraw @s {text:"ESQUEMA / 0–20 PUNTOS",color:"gray",bold:true}
-tellraw @s {text:"VACÍO  ───────────────  SACIADO",color:"yellow"}
-tellraw @s {text:"0                         10                         20",color:"gray"}
-tellraw @s ["",{text:"[VOLVER AL ÍNDICE]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}}]
-tellraw @s {text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}
+tellraw @s ["",{text:"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",color:"dark_gray"}]
+tellraw @s ["",{text:"  LÁMINA 02 · EDUCACIÓN FÍSICA",color:"gray",italic:true}]
+tellraw @s ["",{text:"  ✦ ESCALA DE HAMBRE Y SACIEDAD",color:"gold",bold:true}]
+tellraw @s ["",{text:"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛",color:"dark_gray"}]
+tellraw @s ["",{text:" FIG. 3 ",color:"gold",bold:true},{text:"· Iconos y puntos",color:"yellow",bold:true}]
+tellraw @s ["",{text:"   Un icono  ",color:"white"},{text:"▮",color:"red"},{text:"  =  2 puntos",color:"gray"}]
+tellraw @s ["",{text:"   Barra completa  ",color:"white"},{text:"▮▮▮▮▮▮▮▮▮▮",color:"red"},{text:"  =  20 puntos",color:"gray"}]
+tellraw @s ""
+tellraw @s ["",{text:" FIG. 4 ",color:"gold",bold:true},{text:"· Escala de saciedad",color:"yellow",bold:true}]
+tellraw @s ["",{text:"   0 ",color:"gray"},{text:"▯▯▯▯",color:"dark_red"},{text:"▮▮▮▮",color:"red"},{text:"▮▮▮▮▮▮▮▮▮▮▮▮",color:"gold"},{text:" 20",color:"gray"}]
+tellraw @s ["",{text:"   vacío",color:"gray"},{text:"            ",color:"white"},{text:"saciado",color:"gray"}]
+tellraw @s ""
+tellraw @s ["",{text:" FIG. 5 ",color:"gold",bold:true},{text:"· Gasto de energía",color:"yellow",bold:true}]
+tellraw @s ["",{text:"   Correr, saltar y recibir daño consumen saturación y alimentación.",color:"white"}]
+tellraw @s ["",{text:"   La reserva amarilla se cuenta aparte de estos veinte puntos.",color:"white"}]
+tellraw @s ["",{text:"   RECOMENDACIÓN: ",color:"gold",bold:true},{text:"reponga fuerzas antes de los viajes largos.",color:"gray",italic:true}]
+tellraw @s ["",{text:"[◀ Anterior]",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 11"}},{text:"   ",color:"white"},{text:"[Índice]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}},{text:"   ",color:"white"},{text:"[Siguiente ▶]",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 13"}}]
+tellraw @s ["",{text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}]

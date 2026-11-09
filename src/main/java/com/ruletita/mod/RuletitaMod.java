@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -114,6 +119,25 @@ public final class RuletitaMod {
                 for (RegistryObject<Item> item : LISTA) output.accept(item.get());
                 output.accept(TAZA.get());
                 output.accept(TAZA_CAFE.get());
+                // Kuadros: cuadros con medida configurada (1x1 a 4x4), solo en el inventario creativo.
+                parameters.holders().lookup(Registries.PAINTING_VARIANT).ifPresent(lookup -> {
+                    for (int w = 1; w <= 4; w++) {
+                        for (int h = 1; h <= 4; h++) {
+                            final int ww = w, hh = h;
+                            var key = ResourceKey.create(Registries.PAINTING_VARIANT,
+                                    Identifier.fromNamespaceAndPath("kuadro", "k_" + ww + "x" + hh));
+                            lookup.get(key).ifPresent(holder -> {
+                                ItemStack stack = new ItemStack(Items.PAINTING);
+                                CompoundTag tag = new CompoundTag();
+                                tag.putInt("kuadro", 1);
+                                stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+                                stack.set(DataComponents.ITEM_NAME, Component.literal("Kuadro " + ww + "x" + hh));
+                                stack.set(DataComponents.PAINTING_VARIANT, holder);
+                                output.accept(stack);
+                            });
+                        }
+                    }
+                });
             }).build());
 
     public RuletitaMod(FMLJavaModLoadingContext context) {
