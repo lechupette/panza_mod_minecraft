@@ -17,7 +17,7 @@ public final class GuideBookItem extends Item {
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer && level.getServer() != null) {
             level.getServer().getCommands().performPrefixedCommand(
-                    serverPlayer.createCommandSourceStack(), "function ruletita:guia");
+                    serverPlayer.createCommandSourceStack(), "function panza:guia");
         }
         return InteractionResult.SUCCESS;
     }
