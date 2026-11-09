@@ -26,6 +26,12 @@ jobs:
           python -m pip install --disable-pip-version-check Pillow
           python tools/prepare_stock_textures.py
 
+      - name: Configurar Java 8 para los mapeos oficiales
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "8"
+
       - name: Configurar Java 21
         uses: actions/setup-java@v4
         with:
@@ -42,7 +48,7 @@ jobs:
           "$RUNNER_TEMP/gradle-9.5.0/bin/gradle" --version
 
       - name: Compilar mod
-        run: gradle build --no-daemon --stacktrace
+        run: gradle build --no-daemon --stacktrace -Dorg.gradle.java.installations.paths="$JAVA_HOME_8_X64"
 
       - name: Guardar JAR compilado
         uses: actions/upload-artifact@v4
