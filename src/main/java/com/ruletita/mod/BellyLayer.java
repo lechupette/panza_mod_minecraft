@@ -14,7 +14,7 @@ import net.minecraft.resources.Identifier;
 
 
 /**
- * Panza delantera + nalgas. Conserva la geometria base y escala el volumen con 10 niveles
+ * Panza delantera + nalgas. Conserva la geometria base y escala el volumen con cinco niveles
  * de reserva de grasa. El hambre base no modifica este volumen adicional.
  */
 public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extends RenderLayer<AvatarRenderState, M> {
