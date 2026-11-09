@@ -1,0 +1,12 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  "ruletita:taza_agua",
+  "ruletita:cafe_molido"
+ ],
+ "result": {
+  "id": "ruletita:taza_agua_cafe",
+  "count": 1
+ }
+}

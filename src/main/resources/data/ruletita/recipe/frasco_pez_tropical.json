@@ -1,0 +1,12 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  "ruletita:frasco_formol",
+  "minecraft:tropical_fish"
+ ],
+ "result": {
+  "id": "ruletita:frasco_pez_tropical",
+  "count": 1
+ }
+}

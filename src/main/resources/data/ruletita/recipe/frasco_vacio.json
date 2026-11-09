@@ -1,0 +1,17 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "misc",
+ "pattern": [
+  " N ",
+  "G G",
+  "GGG"
+ ],
+ "key": {
+  "N": "minecraft:iron_nugget",
+  "G": "minecraft:glass_pane"
+ },
+ "result": {
+  "id": "ruletita:frasco_vacio",
+  "count": 1
+ }
+}

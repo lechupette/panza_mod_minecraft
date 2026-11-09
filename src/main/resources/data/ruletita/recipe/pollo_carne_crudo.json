@@ -1,0 +1,16 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  "minecraft:chicken",
+  [
+   "minecraft:beef",
+   "minecraft:porkchop",
+   "minecraft:mutton"
+  ]
+ ],
+ "result": {
+  "id": "ruletita:pollo_carne_crudo",
+  "count": 1
+ }
+}

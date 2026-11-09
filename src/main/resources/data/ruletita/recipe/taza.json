@@ -1,0 +1,17 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "misc",
+ "pattern": [
+  "C C",
+  "CDC",
+  " C "
+ ],
+ "key": {
+  "C": "minecraft:clay_ball",
+  "D": "minecraft:white_dye"
+ },
+ "result": {
+  "id": "ruletita:taza",
+  "count": 2
+ }
+}

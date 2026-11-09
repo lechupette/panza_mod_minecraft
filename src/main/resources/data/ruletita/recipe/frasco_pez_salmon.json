@@ -1,0 +1,12 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "misc",
+ "ingredients": [
+  "ruletita:frasco_formol",
+  "minecraft:salmon"
+ ],
+ "result": {
+  "id": "ruletita:frasco_pez_salmon",
+  "count": 1
+ }
+}
