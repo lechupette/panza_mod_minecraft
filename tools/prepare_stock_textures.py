@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Download free Pexels stock photos and convert them to tiny Minecraft-style textures.
+"""Download free Pexels stock photos and scale them with minimal visual alteration.
 
-The original texture alpha channel is retained where it contains transparency, so the
-existing item silhouettes and specimen shapes are not replaced by square photo cards.
+Photos are resized directly to the existing texture dimensions: no crop, palette
+quantization, posterization, or stylized filters. Existing transparency is preserved.
 If a stock URL is temporarily unavailable, its existing texture is left untouched.
 """
 from __future__ import annotations
@@ -11,7 +11,7 @@ from io import BytesIO
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-from PIL import Image, ImageOps
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "src/main/resources/assets/ruletita/textures"
@@ -48,28 +48,21 @@ def download_photo(photo_id: int) -> bytes:
         return response.read()
 
 
-def pixelize(photo_bytes: bytes, target: Path) -> None:
+def prepare_photo(photo_bytes: bytes, target: Path) -> None:
     with Image.open(target) as old_texture:
         old = old_texture.convert("RGBA")
     width, height = old.size
 
     with Image.open(BytesIO(photo_bytes)) as source:
-        photo = ImageOps.fit(
-            source.convert("RGB"),
-            (width, height),
-            method=Image.Resampling.LANCZOS,
-            centering=(0.5, 0.5),
+        # Keep the complete photograph; only scale it to the existing texture size.
+        photo = source.convert("RGB").resize(
+            (width, height), Image.Resampling.LANCZOS
         )
 
-    # Reduce photographic detail to a compact palette without runtime processing.
-    pixels = photo.quantize(colors=32, method=Image.Quantize.MEDIANCUT).convert("RGB")
-    result = pixels.convert("RGBA")
-
-    # Preserve the original transparent silhouette when the source texture has one.
+    result = photo.convert("RGBA")
     alpha = old.getchannel("A")
     if alpha.getextrema() != (255, 255):
         result.putalpha(alpha)
-
     result.save(target, format="PNG", optimize=True)
 
 
@@ -89,9 +82,9 @@ def main() -> None:
             if not target.is_file():
                 print(f"WARNING: texture target missing: {target}")
                 continue
-            pixelize(data, target)
+            prepare_photo(data, target)
             changed += 1
-            print(f"Pixelized Pexels {photo_id} -> {relative}")
+            print(f"Prepared Pexels photo {photo_id} -> {relative}")
 
     print(f"Prepared {changed} texture(s); {len(failed)} photo source(s) unavailable.")
     # Missing external photos must never prevent the mod itself from compiling.
