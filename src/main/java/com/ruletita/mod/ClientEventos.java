@@ -3,6 +3,7 @@ package com.ruletita.mod;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
@@ -11,15 +12,23 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.AddGuiOverlayLayersEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.gui.overlay.ForgeLayeredDraw;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Mod.EventBusSubscriber(modid = RuletitaMod.MODID, value = Dist.CLIENT)
 public final class ClientEventos {
+    private static final Map<Integer, RenderState> RENDER_STATES = new HashMap<>();
+    private static ClientLevel cachedLevel;
+
     private ClientEventos() { }
 
     static {
         AddGuiOverlayLayersEvent.BUS.addListener(ClientEventos::addHudLayer);
+        TickEvent.ClientTickEvent.Post.BUS.addListener(ClientEventos::refreshRenderStates);
     }
 
     @SubscribeEvent
@@ -35,9 +44,66 @@ public final class ClientEventos {
         avatar.addLayer(new BellyLayer(avatar));
     }
 
+    /**
+     * Lee los equipos una vez por tick de cliente. El render de cada fotograma solo consulta
+     * una entrada ya calculada: no busca entidades ni analiza cadenas durante el render.
+     */
+    private static void refreshRenderStates(TickEvent.ClientTickEvent.Post event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        ClientLevel level = minecraft.level;
+        if (level != cachedLevel) {
+            RENDER_STATES.clear();
+            cachedLevel = level;
+        }
+        if (level == null) return;
+
+        for (Player player : level.players()) {
+            int targetLevel = 0;
+            int fat = 0;
+            Team team = player.getTeam();
+            if (team != null) {
+                String name = team.getName();
+                if (name.startsWith("rzb")) {
+                    int separator = name.indexOf('f', 3);
+                    try {
+                        targetLevel = Math.max(0, Math.min(15, Integer.parseInt(
+                                separator >= 0 ? name.substring(3, separator) : name.substring(3))));
+                        if (separator >= 0) {
+                            fat = Math.max(0, Math.min(5, Integer.parseInt(name.substring(separator + 1))));
+                        }
+                    } catch (NumberFormatException ignored) {
+                        targetLevel = 0;
+                        fat = 0;
+                    }
+                }
+            }
+
+            RenderState state = RENDER_STATES.get(player.getId());
+            if (state == null) {
+                state = new RenderState(targetLevel);
+                RENDER_STATES.put(player.getId(), state);
+            }
+            state.targetLevel = targetLevel;
+            state.fat = fat;
+        }
+
+        RENDER_STATES.keySet().removeIf(entityId -> level.getEntity(entityId) == null);
+    }
+
+    static float smoothLevel(int entityId) {
+        RenderState state = RENDER_STATES.get(entityId);
+        if (state == null) return 0f;
+
+        long now = System.nanoTime();
+        if (state.lastNanos == 0L) state.lastNanos = now;
+        float dt = (float) Math.min(0.1, (now - state.lastNanos) / 1.0e9);
+        state.currentLevel += (state.targetLevel - state.currentLevel) * Math.min(1f, dt * 6f);
+        state.lastNanos = now;
+        return state.currentLevel;
+    }
+
     private static void addHudLayer(AddGuiOverlayLayersEvent event) {
         Identifier name = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "fat_reserve");
-        // La capa se agrega al grupo de la hotbar, después de la barra nativa de hambre y salud.
         event.getLayeredDraw().add(ForgeLayeredDraw.HOTBAR_AND_DECOS, name, ClientEventos::renderFatReserve);
     }
 
@@ -46,26 +112,28 @@ public final class ClientEventos {
         Player player = minecraft.player;
         if (player == null || minecraft.screen != null || minecraft.gameMode == null || minecraft.gameMode.isSpectator()) return;
 
-        Team team = player.getTeam();
-        if (team == null) return;
-        String name = team.getName();
-        int separator = name.indexOf('f', 3);
-        if (!name.startsWith("rzb") || separator < 0) return;
-
-        int fat;
-        try {
-            fat = Math.max(0, Math.min(5, Integer.parseInt(name.substring(separator + 1))));
-        } catch (NumberFormatException ignored) {
-            return;
-        }
-        if (fat == 0) return;
+        RenderState state = RENDER_STATES.get(player.getId());
+        int fat = state == null ? 0 : state.fat;
 
         int x = graphics.guiWidth() / 2 + 10;
         int y = graphics.guiHeight() - 47;
         for (int i = 0; i < 5; i++) {
             int left = x + i * 9;
             graphics.fill(left, y, left + 7, y + 4, 0xFF29231A);
-            if (i < fat) graphics.fill(left + 1, y + 1, left + 6, y + 3, 0xFFFFD34E);
+            graphics.fill(left + 1, y + 1, left + 6, y + 3,
+                    i < fat ? 0xFFFFD34E : 0xFF514B3E);
+        }
+    }
+
+    private static final class RenderState {
+        private float currentLevel;
+        private int targetLevel;
+        private int fat;
+        private long lastNanos;
+
+        private RenderState(int initialLevel) {
+            this.currentLevel = initialLevel;
+            this.targetLevel = initialLevel;
         }
     }
 }
