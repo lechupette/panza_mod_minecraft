@@ -1,3 +1,4 @@
+scoreboard objectives add panza.test dummy
 execute store result score #cod panza.test run clear @s ruletita:frasco_pez_cod 0
 execute store result score #salmon panza.test run clear @s ruletita:frasco_pez_salmon 0
 execute store result score #tropical panza.test run clear @s ruletita:frasco_pez_tropical 0
