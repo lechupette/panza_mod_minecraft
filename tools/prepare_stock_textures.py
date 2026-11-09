@@ -32,7 +32,7 @@ PHOTO_TARGETS = {
         "block/coffee_plant_stage3.png",
     ],
     6152431: ["block/coffee_plant_stage0.png", "block/coffee_plant_stage2.png"],
-    34085: ["item/cafe_tostado.png"],
+    6858480: ["item/cafe_tostado.png"],
     14868344: ["item/cafe_tostado2.png"],
     14770390: ["item/cafe_molido.png"],
 }

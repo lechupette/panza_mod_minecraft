@@ -16,7 +16,7 @@ Las texturas se preparan con fotografías reales gratuitas de Pexels. El script 
 | Pez tropical | https://www.pexels.com/photo/vibrant-tropical-fish-in-a-lush-aquarium-35773832/ | Nguyễn Quang Vũ |
 | Planta / cerezas de café | https://www.pexels.com/photo/coffee-fruits-attached-to-the-shrubs-7125685/ | Michael Burrows |
 | Etapas de la planta | https://www.pexels.com/photo/a-close-up-shot-of-a-coffea-plant-6152431/ | Sergiu Iacob |
-| Café tostado | https://www.pexels.com/photo/a-close-up-shot-of-a-roasted-coffee-beans-34085/ | Negative Space |
+| Café tostado | https://www.pexels.com/photo/close-up-shot-of-roasted-coffee-beans-6858480/ | Vero Andrade |
 | Café tostado alternativo | https://www.pexels.com/photo/close-up-shot-of-a-cup-of-roasted-coffee-beans-14868344/ | Emrah |
 | Café molido | https://www.pexels.com/photo/close-up-shot-of-ground-coffee-14770390/ | Gergely Meszárcsek |
 
