@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "ruletita:item/frasco_formol"
+      "model": "ruletita:block/frasco_formol"
     }
   }
 }
