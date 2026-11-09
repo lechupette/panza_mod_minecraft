@@ -83,23 +83,23 @@ public final class ClientEventos {
                 state = new RenderState(targetLevel);
                 RENDER_STATES.put(player.getId(), state);
             }
-            state.targetLevel = targetLevel;
+            state.targetFat = fat;
             state.fat = fat;
         }
 
         RENDER_STATES.keySet().removeIf(entityId -> level.getEntity(entityId) == null);
     }
 
-    static float smoothLevel(int entityId) {
+    static float smoothFat(int entityId) {
         RenderState state = RENDER_STATES.get(entityId);
         if (state == null) return 0f;
 
         long now = System.nanoTime();
         if (state.lastNanos == 0L) state.lastNanos = now;
         float dt = (float) Math.min(0.1, (now - state.lastNanos) / 1.0e9);
-        state.currentLevel += (state.targetLevel - state.currentLevel) * Math.min(1f, dt * 6f);
+        state.currentFat += (state.targetFat - state.currentFat) * Math.min(1f, dt * 6f);
         state.lastNanos = now;
-        return state.currentLevel;
+        return state.currentFat;
     }
 
     private static void addHudLayer(AddGuiOverlayLayersEvent event) {
@@ -115,8 +115,9 @@ public final class ClientEventos {
         RenderState state = RENDER_STATES.get(player.getId());
         int fat = state == null ? 0 : state.fat;
 
-        int x = graphics.guiWidth() / 2 + 10;
-        int y = graphics.guiHeight() - 47;
+        int x = graphics.guiWidth() / 2 - 22;
+        int y = graphics.guiHeight() - 55;
+        graphics.drawString(minecraft.font, "R", x - 10, y - 1, 0xFFFFD34E, false);
         for (int i = 0; i < 5; i++) {
             int left = x + i * 9;
             graphics.fill(left, y, left + 7, y + 4, 0xFF29231A);
@@ -126,14 +127,14 @@ public final class ClientEventos {
     }
 
     private static final class RenderState {
-        private float currentLevel;
-        private int targetLevel;
+        private float currentFat;
+        private int targetFat;
         private int fat;
         private long lastNanos;
 
         private RenderState(int initialLevel) {
-            this.currentLevel = initialLevel;
-            this.targetLevel = initialLevel;
+            this.currentFat = 0f;
+            this.targetFat = 0;
         }
     }
 }
