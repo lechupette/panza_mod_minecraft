@@ -35,7 +35,7 @@ public final class Eventos {
 
     public static void registerCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("panza")
-                .requires(source -> source.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("hambre")
                         .then(Commands.argument("puntos", IntegerArgumentType.integer(1, 20))
                                 .executes(context -> {
