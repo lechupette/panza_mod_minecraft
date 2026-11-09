@@ -1,5 +1,7 @@
 package com.ruletita.mod;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -19,16 +21,54 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 
-/** Logica de servidor: flatulencias, 10 niveles de alimentacion, 5 de reserva, cafe e insomnio. */
+/** Logica de servidor: alimentacion, reserva corporal, cafe, insomnio y comandos de prueba. */
 public final class Eventos {
     private static final int MAX_GRASA = 5;
     private static final Identifier MOD_VELOCIDAD = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "grasa");
 
     private Eventos() { }
+
+    public static void registerCommands(RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("panza")
+                .requires(source -> source.hasPermission(2))
+                .then(Commands.literal("hambre")
+                        .then(Commands.argument("puntos", IntegerArgumentType.integer(1, 20))
+                                .executes(context -> {
+                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    int points = IntegerArgumentType.getInteger(context, "puntos");
+                                    player.getFoodData().eat(points, 0.0F);
+                                    context.getSource().sendSuccess(
+                                            () -> Component.literal("Hambre aumentada en " + points + " puntos."),
+                                            true);
+                                    return 1;
+                                })))
+                .then(Commands.literal("grasa")
+                        .then(Commands.argument("niveles", IntegerArgumentType.integer(1, 5))
+                                .executes(context -> {
+                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    int amount = IntegerArgumentType.getInteger(context, "niveles");
+                                    CompoundTag data = player.getPersistentData();
+                                    int before = Math.max(0, data.getIntOr("rz_grasa", 0));
+                                    int after = Math.min(MAX_GRASA, before + amount);
+                                    data.putInt("rz_grasa", after);
+                                    context.getSource().sendSuccess(
+                                            () -> Component.literal("Reserva corporal: " + after + " / " + MAX_GRASA + "."),
+                                            true);
+                                    return 1;
+                                })))
+                .then(Commands.literal("limpiar_grasa")
+                        .executes(context -> {
+                            ServerPlayer player = context.getSource().getPlayerOrException();
+                            player.getPersistentData().putInt("rz_grasa", 0);
+                            context.getSource().sendSuccess(() -> Component.literal("Reserva corporal restablecida."), true);
+                            return 1;
+                        })));
+    }
 
     public static void onPlayerTick(TickEvent.PlayerTickEvent.Post event) {
         if (!(event.player() instanceof ServerPlayer sp)) return;
@@ -59,7 +99,7 @@ public final class Eventos {
 
         if (sp.level().getDayTime() % 24000L < 12000L) d.putBoolean("rz_insomnio", false);
 
-        // 10 niveles de hambre nativa (0-20 puntos) + 5 niveles amarillos de exceso.
+        // Diez niveles de hambre nativa más cinco niveles independientes de reserva.
         int alimentacion = food / 2;
         int nivel = Math.max(0, Math.min(10, alimentacion)) + grasa;
         if (nivel != d.getIntOr("rz_nivel", -1) || grasa != d.getIntOr("rz_grasa_sync", -1)) {
@@ -122,6 +162,8 @@ public final class Eventos {
             CompoundTag data = sp.getPersistentData();
             int hungerBefore = data.getIntOr("rz_food_before", -1);
             data.putInt("rz_food_before", -1);
+            // Los alimentos propios son siempre comestibles; al terminarse con la barra llena,
+            // cada unidad consumida aporta un nivel de reserva, hasta el limite de cinco.
             if (hungerBefore >= 20) {
                 int fat = Math.min(MAX_GRASA, data.getIntOr("rz_grasa", 0) + 1);
                 data.putInt("rz_grasa", fat);
