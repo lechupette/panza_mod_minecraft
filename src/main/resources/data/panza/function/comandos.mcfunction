@@ -1,6 +1,7 @@
 tellraw @s {text:"FUNCIONES DISPONIBLES · PANZA",color:"gold",bold:true}
 tellraw @s {text:"/function panza:ayuda — centro de ayuda general.",color:"white"}
-tellraw @s {text:"/function ruletita:guia — manual de mecánicas del mod.",color:"white"}
+tellraw @s {text:"/function ruletita:guia — índice del manual de mecánicas.",color:"white"}
+tellraw @s {text:"Guía del estudiante — libro fabricable con 1 libro y 1 papel; usar para abrir las láminas.",color:"white"}
 tellraw @s {text:"/function kuadro:ayuda — guía específica del sistema Kuadro.",color:"white"}
 tellraw @s {text:"/function kuadro:menu — selector de tamaños; requiere un Kuadro fabricado para convertirlo.",color:"white"}
 tellraw @s {text:"/function kuadro:comandos — comandos específicos de Kuadro.",color:"white"}
