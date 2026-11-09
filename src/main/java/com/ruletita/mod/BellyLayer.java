@@ -12,23 +12,20 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 
-
-/**
- * Panza delantera + nalgas. Conserva la geometria base y escala el volumen con cinco niveles
- * de reserva de grasa. El hambre base no modifica este volumen adicional.
- */
+/** Panza y zona posterior: la forma base siempre está presente; la reserva aumenta su volumen. */
 public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extends RenderLayer<AvatarRenderState, M> {
-
     public BellyLayer(RenderLayerParent<AvatarRenderState, M> parent) {
         super(parent);
     }
+
     @Override
     public void submit(PoseStack pose, SubmitNodeCollector collector, int light, AvatarRenderState state, float yRot, float xRot) {
+        // La panza base no depende de tener grasa acumulada. Antes se retornaba con grasa 0,
+        // por lo que el jugador no veía absolutamente nada al comenzar.
         float fat = ClientEventos.smoothFat(state.id);
-        if (fat < 0.05f) return;
         Identifier skin = state.skin.body().texturePath();
         ModelPart body = this.getParentModel().root().getChild("body");
-        final float t = Math.min(fat / 5f, 1f);
+        final float t = Math.max(0f, Math.min(fat / 5f, 1f));
         pose.pushPose();
         body.translateAndRotate(pose);
         collector.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(skin), (p, vc) -> draw(p, vc, light, t));
