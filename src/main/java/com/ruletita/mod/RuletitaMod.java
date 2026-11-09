@@ -45,20 +45,20 @@ public final class RuletitaMod {
     }
 
     private static RegistryObject<Item> simple(String name, int stack) {
-        RegistryObject<Item> r = ITEMS.register(name, () -> new Item(props(name).stacksTo(stack)));
-        LISTA.add(r);
-        return r;
+        RegistryObject<Item> item = ITEMS.register(name, () -> new Item(props(name).stacksTo(stack)));
+        LISTA.add(item);
+        return item;
     }
 
     private static RegistryObject<Item> food(String name, int nutrition, float saturation, float seconds, int stack) {
-        RegistryObject<Item> r = ITEMS.register(name, () -> new Item(props(name).stacksTo(stack)
-                .component(DataComponents.FOOD, new FoodProperties.Builder().nutrition(nutrition).saturationModifier(saturation).build())
+        RegistryObject<Item> item = ITEMS.register(name, () -> new Item(props(name).stacksTo(stack)
+                .component(DataComponents.FOOD, new FoodProperties.Builder().alwaysEdible().nutrition(nutrition).saturationModifier(saturation).build())
                 .component(DataComponents.CONSUMABLE, Consumable.builder().consumeSeconds(seconds).build())));
-        LISTA.add(r);
-        return r;
+        LISTA.add(item);
+        return item;
     }
 
-    // ---- Pollo con carne
+    // ---- Pollo con carne: se puede comer estando lleno; eso activa el sistema de exceso.
     public static final RegistryObject<Item> POLLO_CARNE_CRUDO = food("pollo_carne_crudo", 6, 0.3f, 4.0f, 16);
     public static final RegistryObject<Item> POLLO_CARNE = food("pollo_carne", 10, 0.6f, 4.0f, 16);
 
@@ -88,17 +88,15 @@ public final class RuletitaMod {
     public static final RegistryObject<Item> FRASCO_PEZ_TROPICAL = simple("frasco_pez_tropical", 16);
     public static final RegistryObject<Item> FRASCO_PEZ_GLOBO = simple("frasco_pez_globo", 16);
 
-    // ---- Sonido
     public static final RegistryObject<SoundEvent> FART = SOUNDS.register("fart",
             () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(MODID, "fart")));
 
-    // ---- Pestana creativa
     public static final RegistryObject<CreativeModeTab> TAB = TABS.register("ruletita", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.ruletita"))
             .icon(() -> TAZA_CAFE.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(CEREZAS_CAFE.get());
-                for (RegistryObject<Item> i : LISTA) output.accept(i.get());
+                for (RegistryObject<Item> item : LISTA) output.accept(item.get());
                 output.accept(TAZA.get());
                 output.accept(TAZA_CAFE.get());
             }).build());
@@ -111,6 +109,7 @@ public final class RuletitaMod {
         TABS.register(bus);
 
         TickEvent.PlayerTickEvent.Post.BUS.addListener(Eventos::onPlayerTick);
+        LivingEntityUseItemEvent.Start.BUS.addListener(Eventos::onUseStart);
         LivingEntityUseItemEvent.Finish.BUS.addListener(Eventos::onUseFinish);
         PlayerSleepInBedEvent.BUS.addListener(Eventos::onSleep);
     }

@@ -23,9 +23,9 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 
-/** Logica de servidor: flatulencias, grasa/panza, cafe e insomnio. */
+/** Logica de servidor: flatulencias, 10 niveles de alimentacion, 5 de reserva, cafe e insomnio. */
 public final class Eventos {
-    private static final int MAX_GRASA = 6;
+    private static final int MAX_GRASA = 5;
     private static final Identifier MOD_VELOCIDAD = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "grasa");
 
     private Eventos() { }
@@ -34,9 +34,8 @@ public final class Eventos {
         if (!(event.player() instanceof ServerPlayer sp)) return;
         CompoundTag d = sp.getPersistentData();
         int food = sp.getFoodData().getFoodLevel();
-        int grasa = d.getIntOr("rz_grasa", 0);
+        int grasa = Math.max(0, Math.min(MAX_GRASA, d.getIntOr("rz_grasa", 0)));
 
-        // --- flatulencias (30 s - 2 min, el doble de frecuentes con 8+ muslos)
         int cd = d.getIntOr("rz_cd", 0);
         if (cd <= 0) cd = 600 + sp.getRandom().nextInt(1801);
         cd -= (food >= 16 ? 2 : 1);
@@ -46,25 +45,27 @@ public final class Eventos {
         }
         d.putInt("rz_cd", cd);
 
-        // --- la grasa baja 1 punto cada 5 minutos
         int dec = d.getIntOr("rz_dec", 0) + 1;
         if (dec >= 6000) {
             dec = 0;
-            if (grasa > 0) { grasa--; d.putInt("rz_grasa", grasa); }
+            if (grasa > 0) {
+                grasa--;
+                d.putInt("rz_grasa", grasa);
+            }
         }
         d.putInt("rz_dec", dec);
 
-        // --- el insomnio termina al amanecer
         if (sp.level().getDayTime() % 24000L < 12000L) d.putBoolean("rz_insomnio", false);
 
-        // --- nivel de panza (0-13) -> equipo "rzbN" que los clientes leen para dibujarla
-        int nivel = Math.max(0, Math.min(7, food - 13)) + grasa;
-        if (nivel != d.getIntOr("rz_nivel", -1)) {
+        // 10 niveles de hambre nativa (0-20 puntos) + 5 niveles amarillos de exceso.
+        int alimentacion = Math.round(food / 2.0f);
+        int nivel = Math.max(0, Math.min(10, alimentacion)) + grasa;
+        if (nivel != d.getIntOr("rz_nivel", -1) || grasa != d.getIntOr("rz_grasa_sync", -1)) {
             d.putInt("rz_nivel", nivel);
-            asignarEquipo(sp, nivel);
+            d.putInt("rz_grasa_sync", grasa);
+            asignarEquipo(sp, nivel, grasa);
         }
 
-        // --- lentitud segun grasa
         if (grasa != d.getIntOr("rz_vel", -1)) {
             d.putInt("rz_vel", grasa);
             AttributeInstance inst = sp.getAttribute(Attributes.MOVEMENT_SPEED);
@@ -75,8 +76,6 @@ public final class Eventos {
                 }
             }
         }
-
-        // La reserva no usa la action bar: el indicador se dibuja en el HUD del cliente.
     }
 
     private static void flatulencia(ServerPlayer sp) {
@@ -87,20 +86,26 @@ public final class Eventos {
         level.sendParticles(ParticleTypes.SNEEZE, sp.getX(), sp.getY() + 0.6, sp.getZ(), 4, 0.25, 0.1, 0.25, 0.01);
     }
 
-    private static void asignarEquipo(ServerPlayer sp, int nivel) {
+    private static void asignarEquipo(ServerPlayer sp, int nivel, int grasa) {
         MinecraftServer server = sp.level().getServer();
         if (server == null) return;
-        Scoreboard sb = server.getScoreboard();
-        String nombre = "rzb" + nivel;
-        PlayerTeam team = sb.getPlayerTeam(nombre);
-        if (team == null) team = sb.addPlayerTeam(nombre);
-        sb.addPlayerToTeam(sp.getScoreboardName(), team);
+        Scoreboard scoreboard = server.getScoreboard();
+        String name = "rzb" + nivel + "f" + grasa;
+        PlayerTeam team = scoreboard.getPlayerTeam(name);
+        if (team == null) team = scoreboard.addPlayerTeam(name);
+        scoreboard.addPlayerToTeam(sp.getScoreboardName(), team);
+    }
+
+    public static void onUseStart(LivingEntityUseItemEvent.Start event) {
+        if (event.getEntity() instanceof ServerPlayer sp && event.getItem().get(DataComponents.FOOD) != null) {
+            sp.getPersistentData().putInt("rz_food_before", sp.getFoodData().getFoodLevel());
+        }
     }
 
     public static void onUseFinish(LivingEntityUseItemEvent.Finish event) {
         LivingEntity entity = event.getEntity();
-        ItemStack usado = event.getItem();
-        if (usado.is(RuletitaMod.TAZA_CAFE.get())) {
+        ItemStack used = event.getItem();
+        if (used.is(RuletitaMod.TAZA_CAFE.get())) {
             event.setResultStack(new ItemStack(RuletitaMod.TAZA.get()));
             if (!entity.level().isClientSide() && entity instanceof ServerPlayer sp) {
                 sp.addEffect(new MobEffectInstance(MobEffects.SPEED, 1200, 1));
@@ -111,21 +116,24 @@ public final class Eventos {
                     sp.displayClientMessage(Component.literal("Demasiado cafe a esta hora: esta noche no podras dormir"), true);
                 }
             }
-        } else if (entity instanceof ServerPlayer sp && usado.get(DataComponents.FOOD) != null) {
-            // comer hasta quedar lleno suma grasa
-            if (sp.getFoodData().getFoodLevel() >= 20) {
-                CompoundTag d = sp.getPersistentData();
-                d.putInt("rz_grasa", Math.min(MAX_GRASA, d.getIntOr("rz_grasa", 0) + 1));
+        } else if (entity instanceof ServerPlayer sp && used.get(DataComponents.FOOD) != null) {
+            CompoundTag data = sp.getPersistentData();
+            int hungerBefore = data.getIntOr("rz_food_before", -1);
+            data.putInt("rz_food_before", -1);
+            // Solo cuenta como exceso si el jugador ya estaba completamente saciado al empezar.
+            if (hungerBefore >= 20) {
+                int fat = Math.min(MAX_GRASA, data.getIntOr("rz_grasa", 0) + 1);
+                data.putInt("rz_grasa", fat);
             }
         }
     }
 
     public static void onSleep(PlayerSleepInBedEvent event) {
-        Player p = event.getEntity();
-        if (p.level().isClientSide()) return;
-        if (p.getPersistentData().getBooleanOr("rz_insomnio", false)) {
+        Player player = event.getEntity();
+        if (player.level().isClientSide()) return;
+        if (player.getPersistentData().getBooleanOr("rz_insomnio", false)) {
             event.setResult(Player.BedSleepingProblem.OTHER_PROBLEM);
-            if (p instanceof ServerPlayer sp) {
+            if (player instanceof ServerPlayer sp) {
                 sp.displayClientMessage(Component.literal("Tienes insomnio: no puedes dormir esta noche"), true);
             }
         }
