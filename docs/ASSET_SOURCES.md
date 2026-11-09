@@ -34,4 +34,4 @@ Preguntas frecuentes: https://help.pexels.com/hc/en-us/articles/360042295174-Wha
 
 ## Verificación de compilación
 
-La compilación de CI prepara también las texturas del atlas de bloques antes de empaquetar el JAR. El workflow instala Gradle desde un espejo alternativo de la distribución oficial con reintentos para evitar depender del endpoint de aprovisionamiento que estaba respondiendo HTTP 504.
+La compilación de CI prepara también las texturas del atlas de bloques antes de empaquetar el JAR. El workflow instala JDK 8 para generar los mapeos oficiales de Forge, conserva JDK 21 para compilar el mod e instala Gradle desde un espejo alternativo de la distribución oficial con reintentos para evitar depender del endpoint de aprovisionamiento que estaba respondiendo HTTP 504.
