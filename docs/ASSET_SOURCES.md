@@ -27,7 +27,7 @@ Preguntas frecuentes: https://help.pexels.com/hc/en-us/articles/360042295174-Wha
 
 - Las fotografías se preparan durante la compilación, nunca dentro del juego.
 - Se conserva la proporción completa de cada fotografía; no se recorta agresivamente.
-- Las texturas finales se amplían a 64 × 64 y conservan la máscara alfa original mediante escalado por vecino más cercano.
+- Cada fotografía se reduce proporcionalmente a un máximo de 16 × 16 y se amplía por vecino más cercano en bloques de 3 × 3 hasta 48 × 48, centrada en un lienzo de 64 × 64. Se conserva la máscara alfa original mediante escalado por vecino más cercano.
 - El detalle fotográfico se mantiene moderadamente pixelado para integrarse con Minecraft.
 - Los modelos de frascos colocados usan el atlas de bloques. El pipeline genera copias de las texturas compartidas de frascos y peces en `textures/block`; los modelos de inventario siguen usando `textures/item`.
 - Si una fuente externa falla, se conserva la textura incluida en el repositorio. La compilación no descarga ni procesa imágenes durante el juego.
