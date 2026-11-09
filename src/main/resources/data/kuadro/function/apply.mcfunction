@@ -1,2 +1,2 @@
-$item replace entity @s weapon.mainhand with minecraft:painting[minecraft:custom_data={kuadro:1b},minecraft:item_name={text:"Kuadro $(w)x$(h)"},minecraft:painting/variant="kuadro:k_$(w)x$(h)"] $(count)
-$title @s actionbar {text:"Kuadro $(w)x$(h)",color:"green"}
+$give @s minecraft:painting[minecraft:custom_data={kuadro:1b},minecraft:item_name={text:"Kuadro $(w)x$(h)",color:"gold",italic:false},minecraft:painting/variant="kuadro:k_$(w)x$(h)"] 1
+$title @s actionbar {text:"Kuadro $(w)x$(h) añadido al inventario",color:"green"}
