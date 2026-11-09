@@ -15,7 +15,6 @@ Las texturas fotográficas usan imágenes gratuitas de Pexels. El proceso se eje
 | Pez globo | https://www.pexels.com/photo/close-up-of-a-blue-fugu-fish-5546939/ | Taryn Elliott |
 | Pez tropical | https://www.pexels.com/photo/vibrant-tropical-fish-in-a-lush-aquarium-35773832/ | Nguyễn Quang Vũ |
 | Planta / cerezas de café | https://www.pexels.com/photo/coffee-fruits-attached-to-the-shrubs-7125685/ | Michael Burrows |
-| Etapas de la planta | https://www.pexels.com/photo/a-close-up-shot-of-a-coffea-plant-6152431/ | Sergiu Iacob |
 | Café tostado | https://www.pexels.com/photo/close-up-shot-of-roasted-coffee-beans-6858480/ | Vero Andrade |
 | Café tostado alternativo | https://www.pexels.com/photo/close-up-shot-of-a-cup-of-roasted-coffee-beans-14868344/ | Emrah |
 | Café molido | https://www.pexels.com/photo/close-up-shot-of-ground-coffee-14770390/ | Gergely Meszárcsek |
@@ -26,12 +25,12 @@ Preguntas frecuentes: https://help.pexels.com/hc/en-us/articles/360042295174-Wha
 ## Tratamiento y compatibilidad
 
 - Las fotografías se preparan durante la compilación, nunca dentro del juego.
-- Se conserva la proporción completa de cada fotografía; no se recorta agresivamente.
-- Cada fotografía se reduce proporcionalmente a un máximo de 16 × 16 y se amplía por vecino más cercano en bloques de 3 × 3 hasta 48 × 48, centrada en un lienzo de 64 × 64. Se conserva la máscara alfa original mediante escalado por vecino más cercano.
-- El detalle fotográfico se mantiene moderadamente pixelado para integrarse con Minecraft.
+- Las texturas de objetos son PNG cuadrados, opacos y autónomos. No se reutiliza la máscara alfa ni la silueta de los antiguos iconos.
+- Se conserva la fotografía completa, sin recortar el sujeto; la imagen se reduce proporcionalmente a 16 × 16, se centra sobre un fondo del tono medio de la propia foto y se amplía a 64 × 64 mediante vecino más cercano (bloques de 4 × 4).
+- Las etapas de la planta cultivable conservan sus sprites de bloque actuales: un recorte fotográfico opaco convertiría el cultivo en una tarjeta cuadrada y no en una planta.
 - Los modelos de frascos colocados usan el atlas de bloques. El pipeline genera copias de las texturas compartidas de frascos y peces en `textures/block`; los modelos de inventario siguen usando `textures/item`.
 - Si una fuente externa falla, se conserva la textura incluida en el repositorio. La compilación no descarga ni procesa imágenes durante el juego.
 
 ## Verificación de compilación
 
-La compilación de CI prepara también las texturas del atlas de bloques antes de empaquetar el JAR. El workflow instala JDK 8 para generar los mapeos oficiales de Forge, conserva JDK 21 para compilar el mod e instala Gradle desde un espejo alternativo de la distribución oficial con reintentos para evitar depender del endpoint de aprovisionamiento que estaba respondiendo HTTP 504.
+La compilación de CI prepara también las texturas del atlas de bloques antes de empaquetar el JAR. El workflow instala JDK 8 para generar los mapeos oficiales de Forge, conserva JDK 21 para compilar el mod e instala Gradle desde un espejo alternativo de la distribución oficial con reintentos.
