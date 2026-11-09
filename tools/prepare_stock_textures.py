@@ -16,7 +16,8 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "src/main/resources/assets/ruletita/textures"
 OUTPUT_SIZE = 64
-PIXEL_SIZE = 48
+PIXEL_SIZE = 16
+PIXEL_SCALE = 3
 
 PHOTO_TARGETS = {
     4264049: ["item/taza.png", "item/taza_agua.png"],
@@ -78,10 +79,11 @@ def prepare_photo(photo_bytes: bytes, target: Path) -> None:
         photo = ImageOps.contain(
             photo, (PIXEL_SIZE, PIXEL_SIZE), Image.Resampling.LANCZOS
         )
-        # A modest pixel scale keeps the Minecraft look without destroying detail.
+        # Enlarge each source pixel into a crisp 3x3 block. This gives a
+        # deliberate Minecraft-like pixel scale without stretching or cropping.
         photo = photo.resize(
-            (max(1, photo.width), max(1, photo.height)),
-            Image.Resampling.LANCZOS,
+            (photo.width * PIXEL_SCALE, photo.height * PIXEL_SCALE),
+            Image.Resampling.NEAREST,
         )
         canvas = Image.new("RGBA", (OUTPUT_SIZE, OUTPUT_SIZE), (0, 0, 0, 0))
         x = (OUTPUT_SIZE - photo.width) // 2
