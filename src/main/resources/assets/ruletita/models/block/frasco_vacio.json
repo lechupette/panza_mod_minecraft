@@ -1,8 +1,9 @@
 {
+ "render_type": "minecraft:translucent",
  "textures": {
-  "glass": "ruletita:item/jar_glass",
-  "lid": "ruletita:item/jar_lid",
-  "particle": "ruletita:item/jar_glass"
+  "glass": "ruletita:block/jar_glass",
+  "lid": "ruletita:block/jar_lid",
+  "particle": "ruletita:block/jar_glass"
  },
  "elements": [
   {
