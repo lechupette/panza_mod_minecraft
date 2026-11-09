@@ -65,7 +65,6 @@ public final class ClientEventos {
                 if (name.startsWith("rzb")) {
                     int separator = name.indexOf('f', 3);
                     try {
-                        if (separator < 0) Integer.parseInt(name.substring(3));
                         if (separator >= 0) {
                             fat = Math.max(0, Math.min(5, Integer.parseInt(name.substring(separator + 1))));
                         }
@@ -104,6 +103,10 @@ public final class ClientEventos {
         event.getLayeredDraw().add(ForgeLayeredDraw.HOTBAR_AND_DECOS, name, ClientEventos::renderFatReserve);
     }
 
+    /**
+     * Reserva adicional: cinco segmentos independientes, alineados debajo de la barra
+     * nativa de hambre. Se dibuja con primitivas GUI ya disponibles, sin texturas ni ticks extra.
+     */
     private static void renderFatReserve(GuiGraphics graphics, DeltaTracker delta) {
         Minecraft minecraft = Minecraft.getInstance();
         Player player = minecraft.player;
@@ -112,13 +115,13 @@ public final class ClientEventos {
         RenderState state = RENDER_STATES.get(player.getId());
         int fat = state == null ? 0 : state.fat;
 
-        int x = graphics.guiWidth() / 2 - 14;
-        int y = graphics.guiHeight() - 57;
-        graphics.drawString(minecraft.font, "RES", x - 24, y, 0xFFFFD34E, false);
+        int x = graphics.guiWidth() / 2 + 10;
+        int y = graphics.guiHeight() - 30;
+        graphics.drawString(minecraft.font, "R", x - 9, y - 1, 0xFFFFD34E, false);
         for (int i = 0; i < 5; i++) {
-            int left = x + i * 10;
-            graphics.fill(left, y - 1, left + 9, y + 7, 0xFF17130D);
-            graphics.fill(left + 1, y, left + 8, y + 6,
+            int left = x + i * 9;
+            graphics.fill(left, y, left + 8, y + 6, 0xFF17130D);
+            graphics.fill(left + 1, y + 1, left + 7, y + 5,
                     i < fat ? 0xFFFFD34E : 0xFF514B3E);
         }
     }
