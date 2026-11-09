@@ -2,7 +2,6 @@ package com.ruletita.mod;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -12,55 +11,16 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.scores.Team;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Panza delantera + nalgas. Conserva la geometria base y escala el volumen con 10 niveles
  * de alimentacion y 5 niveles de reserva. El equipo sincroniza el nivel con los clientes.
  */
 public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extends RenderLayer<AvatarRenderState, M> {
-    private static final Map<Integer, double[]> CURRENT = new HashMap<>();
-
-    public BellyLayer(RenderLayerParent<AvatarRenderState, M> parent) {
-        super(parent);
-    }
-
-    private static float targetLevel(int entityId) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return 0f;
-        Entity e = mc.level.getEntity(entityId);
-        if (e == null) return 0f;
-        Team team = e.getTeam();
-        if (team == null) return 0f;
-        String name = team.getName();
-        if (!name.startsWith("rzb")) return 0f;
-        int separator = name.indexOf('f', 3);
-        String level = separator >= 0 ? name.substring(3, separator) : name.substring(3);
-        try {
-            return Math.max(0f, Math.min(15f, Integer.parseInt(level)));
-        } catch (NumberFormatException ignored) {
-            return 0f;
-        }
-    }
-
-    private static float smooth(int id) {
-        long now = System.nanoTime();
-        if (CURRENT.size() > 128) CURRENT.clear();
-        float target = targetLevel(id);
-        double[] state = CURRENT.computeIfAbsent(id, key -> new double[]{target, now});
-        float dt = (float) Math.min(0.1, (now - (long) state[1]) / 1.0e9);
-        state[0] += (target - state[0]) * Math.min(1.0, dt * 6.0);
-        state[1] = now;
-        return (float) state[0];
-    }
-
     @Override
     public void submit(PoseStack pose, SubmitNodeCollector collector, int light, AvatarRenderState state, float yRot, float xRot) {
-        float level = smooth(state.id);
+        float level = ClientEventos.smoothLevel(state.id);
         if (level < 0.05f) return;
         Identifier skin = state.skin.body().texturePath();
         ModelPart body = this.getParentModel().root().getChild("body");
