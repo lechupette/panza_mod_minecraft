@@ -1,2 +1,2 @@
 advancement revoke @s only kuadro:crafted
-function kuadro:menu
+title @s actionbar {text:"Kuadro 1x1 fabricado. Para otra medida: /trigger kuadro set 1",color:"gold"}
