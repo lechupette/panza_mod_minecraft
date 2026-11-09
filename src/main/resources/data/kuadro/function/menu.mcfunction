@@ -1,3 +1,4 @@
+scoreboard players enable @s kuadro
 tellraw @s {text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}
 tellraw @s {text:"SELECTOR DE KUADROS",color:"gold",bold:true}
 tellraw @s {text:"Elegí el tamaño del Kuadro que acabás de fabricar. Se consume el ejemplar sin configurar y se devuelve configurado.",color:"white"}
