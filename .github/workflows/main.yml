@@ -21,7 +21,7 @@ jobs:
       - name: Descargar codigo
         uses: actions/checkout@v4
 
-      - name: Preparar texturas fotograficas pixeladas
+      - name: Preparar texturas fotograficas
         run: |
           python -m pip install --disable-pip-version-check Pillow
           python tools/prepare_stock_textures.py
