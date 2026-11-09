@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -68,7 +69,7 @@ public final class RuletitaMod {
         return item;
     }
 
-    // ---- Pollo con carne: se puede comer estando lleno; eso activa el sistema de exceso.
+    // Alimentos del mod: siempre se pueden consumir, incluso con la barra llena.
     public static final RegistryObject<Item> POLLO_CARNE_CRUDO = food("pollo_carne_crudo", 6, 0.3f, 4.0f, 16);
     public static final RegistryObject<Item> POLLO_CARNE = food("pollo_carne", 10, 0.6f, 4.0f, 16);
 
@@ -121,6 +122,7 @@ public final class RuletitaMod {
         SOUNDS.register(bus);
         TABS.register(bus);
 
+        RegisterCommandsEvent.BUS.addListener(Eventos::registerCommands);
         TickEvent.PlayerTickEvent.Post.BUS.addListener(Eventos::onPlayerTick);
         LivingEntityUseItemEvent.Start.BUS.addListener(Eventos::onUseStart);
         LivingEntityUseItemEvent.Finish.BUS.addListener(Eventos::onUseFinish);
