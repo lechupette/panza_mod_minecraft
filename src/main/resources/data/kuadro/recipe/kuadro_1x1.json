@@ -20,11 +20,11 @@
     "kuadro": 1
    },
    "minecraft:item_name": {
-    "text": "Kuadro sin configurar",
+    "text": "Kuadro 1x1",
     "color": "gold",
     "italic": false
    },
-   "minecraft:painting/variant": "minecraft:kebab"
+   "minecraft:painting/variant": "kuadro:k_1x1"
   }
  }
 }
