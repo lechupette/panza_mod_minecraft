@@ -1,0 +1,22 @@
+{
+ "item.ruletita.pollo_carne_crudo": "Pollo con carne crudo",
+ "item.ruletita.pollo_carne": "Pollo con carne",
+ "item.ruletita.cafe_tostado": "Café tostado",
+ "item.ruletita.cafe_tostado2": "Café doblemente tostado",
+ "item.ruletita.cafe_molido": "Café molido",
+ "item.ruletita.taza": "Taza",
+ "item.ruletita.taza_agua": "Taza con agua",
+ "item.ruletita.taza_agua_cafe": "Taza con agua y café molido",
+ "item.ruletita.taza_cafe": "Taza de café",
+ "item.ruletita.formol": "Formol",
+ "item.ruletita.frasco_vacio": "Frasco vacío",
+ "item.ruletita.frasco_formol": "Frasco con formol",
+ "item.ruletita.cerezas_cafe": "Cerezas de café",
+ "item.ruletita.frasco_pez_cod": "Frasco con bacalao conservado",
+ "item.ruletita.frasco_pez_salmon": "Frasco con salmón conservado",
+ "item.ruletita.frasco_pez_tropical": "Frasco con pez tropical conservado",
+ "item.ruletita.frasco_pez_globo": "Frasco con pez globo conservado",
+ "block.ruletita.coffee_plant": "Planta de café",
+ "itemGroup.ruletita": "Ruletita Extendida",
+ "subtitles.ruletita.fart": "Flatulencia"
+}
