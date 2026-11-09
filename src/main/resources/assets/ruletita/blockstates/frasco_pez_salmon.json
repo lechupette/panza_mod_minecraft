@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "ruletita:item/frasco_pez_salmon"
+      "model": "ruletita:block/frasco_pez_salmon"
     }
   }
 }
