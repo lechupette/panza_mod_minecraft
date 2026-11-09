@@ -1,3 +1,4 @@
+scoreboard objectives add panza.test dummy
 tellraw @s {text:"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",color:"dark_gray"}
 tellraw @s {text:"DIAGNÓSTICO DEL MOD PANZA",color:"gold",bold:true}
 tellraw @s {text:"Comprobaciones no destructivas del estado actual del jugador.",color:"gray"}
