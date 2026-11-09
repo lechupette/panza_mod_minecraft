@@ -18,6 +18,10 @@ import net.minecraft.resources.Identifier;
  * de alimentacion y 5 niveles de reserva. El equipo sincroniza el nivel con los clientes.
  */
 public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extends RenderLayer<AvatarRenderState, M> {
+
+    public BellyLayer(RenderLayerParent<AvatarRenderState, M> parent) {
+        super(parent);
+    }
     @Override
     public void submit(PoseStack pose, SubmitNodeCollector collector, int light, AvatarRenderState state, float yRot, float xRot) {
         float level = ClientEventos.smoothLevel(state.id);
