@@ -64,7 +64,7 @@ public final class RuletitaMod {
 
     // ---- Cafe
     public static final RegistryObject<Block> COFFEE_PLANT = BLOCKS.register("coffee_plant", () -> new CoffeeCropBlock(
-            BlockBehaviour.Properties.of().setId(BLOCKS.key("coffee_plant")).mapColor(MapColor.PLANT).noCollission()
+            BlockBehaviour.Properties.of().setId(BLOCKS.key("coffee_plant")).mapColor(MapColor.PLANT).noCollision()
                     .randomTicks().instabreak().sound(SoundType.CROP).pushReaction(PushReaction.DESTROY)));
     public static final RegistryObject<Item> CEREZAS_CAFE = ITEMS.register("cerezas_cafe",
             () -> new BlockItem(COFFEE_PLANT.get(), props("cerezas_cafe").useItemDescriptionPrefix()));
