@@ -34,7 +34,9 @@ public final class Eventos {
         if (!(event.player() instanceof ServerPlayer sp)) return;
         CompoundTag d = sp.getPersistentData();
         int food = sp.getFoodData().getFoodLevel();
-        int grasa = Math.max(0, Math.min(MAX_GRASA, d.getIntOr("rz_grasa", 0)));
+        int storedFat = d.getIntOr("rz_grasa", 0);
+        int grasa = Math.max(0, Math.min(MAX_GRASA, storedFat));
+        if (grasa != storedFat) d.putInt("rz_grasa", grasa);
 
         int cd = d.getIntOr("rz_cd", 0);
         if (cd <= 0) cd = 600 + sp.getRandom().nextInt(1801);
@@ -58,7 +60,7 @@ public final class Eventos {
         if (sp.level().getDayTime() % 24000L < 12000L) d.putBoolean("rz_insomnio", false);
 
         // 10 niveles de hambre nativa (0-20 puntos) + 5 niveles amarillos de exceso.
-        int alimentacion = Math.round(food / 2.0f);
+        int alimentacion = food / 2;
         int nivel = Math.max(0, Math.min(10, alimentacion)) + grasa;
         if (nivel != d.getIntOr("rz_nivel", -1) || grasa != d.getIntOr("rz_grasa_sync", -1)) {
             d.putInt("rz_nivel", nivel);
@@ -120,7 +122,6 @@ public final class Eventos {
             CompoundTag data = sp.getPersistentData();
             int hungerBefore = data.getIntOr("rz_food_before", -1);
             data.putInt("rz_food_before", -1);
-            // Solo cuenta como exceso si el jugador ya estaba completamente saciado al empezar.
             if (hungerBefore >= 20) {
                 int fat = Math.min(MAX_GRASA, data.getIntOr("rz_grasa", 0) + 1);
                 data.putInt("rz_grasa", fat);

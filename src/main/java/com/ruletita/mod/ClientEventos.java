@@ -19,7 +19,6 @@ public final class ClientEventos {
     private ClientEventos() { }
 
     static {
-        // Forge 1.21.11 inserta HUDs personalizados mediante ForgeLayeredDraw.
         AddGuiOverlayLayersEvent.BUS.addListener(ClientEventos::addHudLayer);
     }
 
@@ -38,12 +37,8 @@ public final class ClientEventos {
 
     private static void addHudLayer(AddGuiOverlayLayersEvent event) {
         Identifier name = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "fat_reserve");
-        event.getLayeredDraw().addAbove(
-                ForgeLayeredDraw.HOTBAR_AND_DECOS,
-                name,
-                ForgeLayeredDraw.HEALTH_BAR,
-                ClientEventos::renderFatReserve
-        );
+        // La capa se agrega al grupo de la hotbar, después de la barra nativa de hambre y salud.
+        event.getLayeredDraw().add(ForgeLayeredDraw.HOTBAR_AND_DECOS, name, ClientEventos::renderFatReserve);
     }
 
     private static void renderFatReserve(GuiGraphics graphics, DeltaTracker delta) {
