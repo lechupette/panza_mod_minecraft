@@ -8,10 +8,15 @@ tellraw @s ["",{text:"   Reserva       ",color:"yellow"},{text:"▮▮▮▮▮"
 tellraw @s ["",{text:"   Los segmentos amarillos se dibujan sobre la barra de alimentación.",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" FIG. 2 ",color:"gold",bold:true},{text:"· Cómo se acumula",color:"yellow",bold:true}]
-tellraw @s ["",{text:"   Al consumir un alimento con la barra completa, la reserva sube un nivel.",color:"white"}]
+tellraw @s ["",{text:"   Con la barra completa, cualquier alimento que se coma suma un nivel de reserva.",color:"white"}]
 tellraw @s ["",{text:"   Con el paso del tiempo la reserva disminuye de forma gradual.",color:"white"}]
 tellraw @s ""
-tellraw @s ["",{text:" FIG. 3 ",color:"gold",bold:true},{text:"· Volumen según la reserva",color:"yellow",bold:true}]
+tellraw @s ["",{text:" FIG. 3 ",color:"gold",bold:true},{text:"· Alimento de reserva: pollo con carne",color:"yellow",bold:true}]
+tellraw @s ["",{text:"   1. ",color:"gold",bold:true},{text:"Combine en la mesa de trabajo un pollo crudo y una carne cruda (res, cerdo o cordero).",color:"white"}]
+tellraw @s ["",{text:"   2. ",color:"gold",bold:true},{text:"Para la versión completa, combine un pollo cocinado y una carne cocinada.",color:"white"}]
+tellraw @s ["",{text:"   Se puede comer aunque la barra esté completa. El cocinado sacia más.",color:"gray"}]
+tellraw @s ""
+tellraw @s ["",{text:" FIG. 4 ",color:"gold",bold:true},{text:"· Volumen según la reserva",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   0  ",color:"gold",bold:true},{text:"▯▯▯▯▯",color:"gold"},{text:"  Silueta normal",color:"white"}]
 tellraw @s ["",{text:"   1  ",color:"gold",bold:true},{text:"▮▯▯▯▯",color:"gold"},{text:"  Leve redondez en abdomen y zona posterior",color:"white"}]
 tellraw @s ["",{text:"   2  ",color:"gold",bold:true},{text:"▮▮▯▯▯",color:"gold"},{text:"  Volumen moderado",color:"white"}]
@@ -19,7 +24,7 @@ tellraw @s ["",{text:"   3  ",color:"gold",bold:true},{text:"▮▮▮▯▯",co
 tellraw @s ["",{text:"   4  ",color:"gold",bold:true},{text:"▮▮▮▮▯",color:"gold"},{text:"  Volumen muy evidente",color:"white"}]
 tellraw @s ["",{text:"   5  ",color:"gold",bold:true},{text:"▮▮▮▮▮",color:"gold"},{text:"  Volumen máximo",color:"white"}]
 tellraw @s ""
-tellraw @s ["",{text:" FIG. 4 ",color:"gold",bold:true},{text:"· Movimiento",color:"yellow",bold:true}]
+tellraw @s ["",{text:" FIG. 5 ",color:"gold",bold:true},{text:"· Movimiento",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   Cada nivel acumulado reduce la velocidad de marcha en un 5 %.",color:"white"}]
 tellraw @s ["",{text:"   RECOMENDACIÓN: ",color:"gold",bold:true},{text:"evite el exceso continuado de alimentos.",color:"gray",italic:true}]
 tellraw @s ["",{text:"            ",color:"white"},{text:"   ",color:"white"},{text:"[Índice]",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}},{text:"   ",color:"white"},{text:"[Siguiente ▶]",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 12"}}]

@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": ["minecraft:sweet_berries", "minecraft:cocoa_beans"],
+  "result": { "id": "ruletita:cerezas_cafe", "count": 2 }
+}
