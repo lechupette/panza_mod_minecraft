@@ -153,5 +153,6 @@ public final class RuletitaMod {
         LivingEntityUseItemEvent.Finish.BUS.addListener(Eventos::onUseFinish);
         PlayerInteractEvent.RightClickItem.BUS.addListener(Eventos::onRightClickItem);
         PlayerSleepInBedEvent.BUS.addListener(Eventos::onSleep);
+        net.minecraftforge.event.village.VillagerTradesEvent.BUS.addListener(Eventos::onVillagerTrades);
     }
 }

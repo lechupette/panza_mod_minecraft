@@ -20,6 +20,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.trading.ItemCost;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -158,6 +161,17 @@ public final class Eventos {
      * Permite empezar a comer cualquier alimento con la barra de hambre llena (vanilla lo impide).
      * Solo en servidor; los alimentos "siempre comestibles" siguen el camino normal.
      */
+    /** El aldeano granjero vende cerezas de café en el nivel de novato. */
+    public static void onVillagerTrades(VillagerTradesEvent event) {
+        if (!event.getType().toString().contains("farmer")) return;
+        var level1 = event.getTrades().get(1);
+        if (level1 == null) return;
+        level1.add((level, trader, random) -> new MerchantOffer(
+                new ItemCost(net.minecraft.world.item.Items.EMERALD, 1),
+                new ItemStack(RuletitaMod.CEREZAS_CAFE.get(), 4),
+                12, 2, 0.05f));
+    }
+
     private static boolean esComidaNormal(ItemStack stack) {
         var food = stack.get(DataComponents.FOOD);
         return food != null && !food.canAlwaysEat() && stack.get(DataComponents.CONSUMABLE) != null;

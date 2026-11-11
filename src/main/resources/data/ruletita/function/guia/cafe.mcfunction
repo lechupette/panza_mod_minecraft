@@ -3,7 +3,7 @@ tellraw @s ["",{text:"  LÁMINA 03 · TALLER DE CIENCIAS APLICADAS",color:"gray"
 tellraw @s ["",{text:"  ✦ CAFÉ: CULTIVO, PREPARACIÓN Y EFECTOS",color:"gold",bold:true}]
 tellraw @s ["",{text:"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛",color:"dark_gray"}]
 tellraw @s ["",{text:" FIG. 9 ",color:"gold",bold:true},{text:"· Cultivo",color:"yellow",bold:true}]
-tellraw @s ["",{text:"   1. ",color:"gold",bold:true},{text:"Busque plantas de café silvestres en la selva y recoja sus cerezas.",color:"white"}]
+tellraw @s ["",{text:"   1. ",color:"gold",bold:true},{text:"Busque plantas de café en la selva o en las granjas de las aldeas; el granjero también las vende.",color:"white"}]
 tellraw @s ["",{text:"   2. ",color:"gold",bold:true},{text:"Siémbrelas en tierra o tierra labrada. La planta atraviesa 4 etapas.",color:"white"}]
 tellraw @s ["",{text:"   3. ",color:"gold",bold:true},{text:"Coseche la planta madura: rinde 2 o 3 cerezas.",color:"white"}]
 tellraw @s ""
