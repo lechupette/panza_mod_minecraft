@@ -3,6 +3,7 @@ package com.ruletita.mod;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -31,7 +32,7 @@ import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 
-/** Logica de servidor: alimentacion, reserva corporal, cafe, insomnio y comandos de prueba. */
+/** Logica de servidor: alimentacion, grasa, cafe, insomnio y comandos de prueba. */
 public final class Eventos {
     private static final int MAX_GRASA = 5;
     private static final Identifier MOD_VELOCIDAD = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "grasa");
@@ -62,7 +63,7 @@ public final class Eventos {
                                     int after = Math.min(MAX_GRASA, before + amount);
                                     data.putInt("rz_grasa", after);
                                     context.getSource().sendSuccess(
-                                            () -> Component.literal("Reserva corporal: " + after + " / " + MAX_GRASA + "."),
+                                            () -> Component.literal("Grasa: " + after + " / " + MAX_GRASA + "."),
                                             true);
                                     return 1;
                                 })))
@@ -70,7 +71,7 @@ public final class Eventos {
                         .executes(context -> {
                             ServerPlayer player = context.getSource().getPlayerOrException();
                             player.getPersistentData().putInt("rz_grasa", 0);
-                            context.getSource().sendSuccess(() -> Component.literal("Reserva corporal restablecida."), true);
+                            context.getSource().sendSuccess(() -> Component.literal("Grasa restablecida."), true);
                             return 1;
                         })));
     }
@@ -144,7 +145,10 @@ public final class Eventos {
         level.playSound(null, sp.getX(), sp.getY(), sp.getZ(), RuletitaMod.FART.get(), SoundSource.PLAYERS,
                 1.0f, 0.9f + sp.getRandom().nextFloat() * 0.3f);
         level.sendParticles(ParticleTypes.POOF, sp.getX(), sp.getY() + 0.6, sp.getZ(), 6, 0.2, 0.1, 0.2, 0.02);
-        level.sendParticles(ParticleTypes.SNEEZE, sp.getX(), sp.getY() + 0.6, sp.getZ(), 4, 0.25, 0.1, 0.25, 0.01);
+        // Nube (POOF) + tres colores a la vez: verde oliva, marrón y amarillo mostaza.
+        level.sendParticles(new DustParticleOptions(0x6B7B2E, 1.4f), sp.getX(), sp.getY() + 0.6, sp.getZ(), 5, 0.25, 0.12, 0.25, 0.01);
+        level.sendParticles(new DustParticleOptions(0x6A4A25, 1.4f), sp.getX(), sp.getY() + 0.6, sp.getZ(), 5, 0.25, 0.12, 0.25, 0.01);
+        level.sendParticles(new DustParticleOptions(0xC9A227, 1.4f), sp.getX(), sp.getY() + 0.6, sp.getZ(), 5, 0.25, 0.12, 0.25, 0.01);
     }
 
     private static void asignarEquipo(ServerPlayer sp, int nivel, int grasa) {
@@ -222,7 +226,7 @@ public final class Eventos {
                 int previousFat = data.getIntOr("rz_grasa", 0);
                 if (previousFat < MAX_GRASA) {
                     data.putInt("rz_grasa", previousFat + 1);
-                    sp.displayClientMessage(Component.literal("Reserva corporal: " + (previousFat + 1) + " / " + MAX_GRASA), true);
+                    sp.displayClientMessage(Component.literal("Grasa: " + (previousFat + 1) + " / " + MAX_GRASA), true);
                 }
             }
         }

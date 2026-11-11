@@ -6,7 +6,7 @@ tellraw @s ["",{text:"▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬�
 tellraw @s ""
 tellraw @s ["",{text:"   Bienvenido, estudiante. Elija una lámina:",color:"gray"}]
 tellraw @s ""
-tellraw @s ["",{text:"  ♥ ",color:"gold"},{text:"Lámina 01  ",color:"gold",bold:true},{text:"Alimentación y reservas",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 11"},hover_event:{action:"show_text",value:{text:"Abrir lámina"}}}]
+tellraw @s ["",{text:"  ♥ ",color:"gold"},{text:"Lámina 01  ",color:"gold",bold:true},{text:"Alimentación y grasa",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 11"},hover_event:{action:"show_text",value:{text:"Abrir lámina"}}}]
 tellraw @s ["",{text:"  ♦ ",color:"gold"},{text:"Lámina 02  ",color:"gold",bold:true},{text:"Hambre y saciedad",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 12"},hover_event:{action:"show_text",value:{text:"Abrir lámina"}}}]
 tellraw @s ["",{text:"  ☼ ",color:"gold"},{text:"Lámina 03  ",color:"gold",bold:true},{text:"El café",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 13"},hover_event:{action:"show_text",value:{text:"Abrir lámina"}}}]
 tellraw @s ["",{text:"  ♣ ",color:"gold"},{text:"Lámina 04  ",color:"gold",bold:true},{text:"Frascos de especímenes",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 14"},hover_event:{action:"show_text",value:{text:"Abrir lámina"}}}]

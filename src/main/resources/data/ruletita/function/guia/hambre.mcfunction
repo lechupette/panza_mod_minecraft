@@ -13,7 +13,7 @@ tellraw @s ["",{text:"   vacío  ",color:"gray"},{text:"♥♥",color:"dark_red"
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"3 · ",color:"gold",bold:true},{text:"Gasto de energía",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   Correr, saltar y recibir daño consumen saturación y alimentación.",color:"white"}]
-tellraw @s ["",{text:"   La reserva amarilla se cuenta aparte de estos 20 puntos.",color:"white"}]
+tellraw @s ["",{text:"   La grasa amarilla se cuenta aparte de estos 20 puntos.",color:"white"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"4 · ",color:"gold",bold:true},{text:"Comer sin hambre",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   Con la barra llena, sostener un alimento basta para poder comerlo.",color:"white"}]

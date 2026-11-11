@@ -107,6 +107,18 @@ public final class ClientEventos {
      * Reserva adicional: cinco segmentos independientes, alineados debajo de la barra
      * nativa de hambre. Se dibuja con primitivas GUI ya disponibles, sin texturas ni ticks extra.
      */
+    // Icono de 9x8 con la forma del muslo de comida: o=contorno, f=carne, h=brillo, b=hueso.
+    private static final String[] ICON = {
+            "....ooo..",
+            "...offfo.",
+            "..ohffffo",
+            "..offfffo",
+            "..offfffo",
+            ".obofffo.",
+            "obbo.ooo.",
+            "oooo....."
+    };
+
     private static void renderFatReserve(GuiGraphics graphics, DeltaTracker delta) {
         Minecraft minecraft = Minecraft.getInstance();
         Player player = minecraft.player;
@@ -116,15 +128,30 @@ public final class ClientEventos {
         RenderState state = RENDER_STATES.get(player.getId());
         int fat = state == null ? 0 : state.fat;
 
-        // Sobrebarra: justo encima de la barra de hambre nativa (que ocupa x+10..x+91, y = alto-39).
-        int x = graphics.guiWidth() / 2 + 10;
-        int y = graphics.guiHeight() - 39 - 7;
+        // Fila de grasa justo sobre la barra de hambre. Bajo el agua, las burbujas ocupan esa fila:
+        // la grasa sube una fila más para que nunca se mezclen.
+        boolean bubbles = player.isUnderWater() || player.getAirSupply() < player.getMaxAirSupply();
+        int y = graphics.guiHeight() - 49 - (bubbles ? 10 : 0);
+        int right = graphics.guiWidth() / 2 + 82;
         for (int i = 0; i < 5; i++) {
-            int left = x + i * 16;
-            boolean full = i < fat;
-            graphics.fill(left, y, left + 15, y + 5, 0xFF2B2415);
-            graphics.fill(left + 1, y + 1, left + 14, y + 4, full ? 0xFFE6B422 : 0xFF4A4332);
-            if (full) graphics.fill(left + 1, y + 1, left + 14, y + 2, 0xFFFBE27A);
+            drawFatIcon(graphics, right - i * 8, y + 1, i < fat);
+        }
+    }
+
+    private static void drawFatIcon(GuiGraphics graphics, int x, int y, boolean full) {
+        for (int row = 0; row < ICON.length; row++) {
+            String line = ICON[row];
+            for (int col = 0; col < line.length(); col++) {
+                int color;
+                switch (line.charAt(col)) {
+                    case 'o' -> color = full ? 0xFF2E1F00 : 0xFF1F1A10;
+                    case 'f' -> color = full ? 0xFFE3A400 : 0xFF4A4330;
+                    case 'h' -> color = full ? 0xFFFFE58A : 0xFF4A4330;
+                    case 'b' -> color = full ? 0xFFF4E8C0 : 0xFF6A6455;
+                    default -> { continue; }
+                }
+                graphics.fill(x + col, y + row, x + col + 1, y + row + 1, color);
+            }
         }
     }
 

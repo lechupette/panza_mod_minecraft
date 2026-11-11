@@ -60,7 +60,7 @@ public final class RuletitaMod {
     private static RegistryObject<Item> jar(String name) {
         RegistryObject<Block> block = BLOCKS.register(name, () -> new SpecimenJarBlock(
                 BlockBehaviour.Properties.of().setId(BLOCKS.key(name)).mapColor(MapColor.COLOR_LIGHT_GRAY)
-                        .strength(0.3f).noOcclusion()));
+                        .strength(0.3f).sound(SoundType.GLASS).noOcclusion()));
         RegistryObject<Item> item = ITEMS.register(name,
                 () -> new BlockItem(block.get(), props(name).useItemDescriptionPrefix()));
         LISTA.add(item);
