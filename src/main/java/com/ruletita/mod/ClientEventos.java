@@ -24,6 +24,7 @@ public final class ClientEventos {
     private static final Map<Integer, RenderState> RENDER_STATES = new HashMap<>();
     private static ClientLevel cachedLevel;
     private static int cleanupTicks;
+    private static int debugTicks = 100;
 
     private ClientEventos() { }
 
@@ -51,6 +52,11 @@ public final class ClientEventos {
      */
     private static void refreshRenderStates(TickEvent.ClientTickEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
+        if (++debugTicks >= 100) {
+            debugTicks = 0;
+            Debug.reload(minecraft.gameDirectory);
+        }
+        if (!Debug.clientTick) return;
         ClientLevel level = minecraft.level;
         if (level != cachedLevel) {
             RENDER_STATES.clear();
@@ -124,6 +130,7 @@ public final class ClientEventos {
     };
 
     private static void renderFatReserve(GuiGraphics graphics, DeltaTracker delta) {
+        if (!Debug.hud) return;
         Minecraft minecraft = Minecraft.getInstance();
         Player player = minecraft.player;
         if (player == null || minecraft.options.hideGui || minecraft.gameMode == null

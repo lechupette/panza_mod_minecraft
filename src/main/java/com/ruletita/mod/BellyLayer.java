@@ -22,6 +22,7 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
     public void submit(PoseStack pose, SubmitNodeCollector collector, int light, AvatarRenderState state, float yRot, float xRot) {
         // La panza base no depende de tener grasa acumulada. Antes se retornaba con grasa 0,
         // por lo que el jugador no veía absolutamente nada al comenzar.
+        if (!Debug.belly) return;
         float fat = ClientEventos.smoothFat(state.id);
         Identifier skin = state.skin.body().texturePath();
         ModelPart body = this.getParentModel().root().getChild("body");

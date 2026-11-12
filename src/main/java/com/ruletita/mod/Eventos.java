@@ -77,6 +77,7 @@ public final class Eventos {
     }
 
     public static void onPlayerTick(TickEvent.PlayerTickEvent.Post event) {
+        if (!Debug.serverTick) return;
         if (!(event.player() instanceof ServerPlayer sp)) return;
         CompoundTag d = sp.getPersistentData();
         int food = sp.getFoodData().getFoodLevel();
