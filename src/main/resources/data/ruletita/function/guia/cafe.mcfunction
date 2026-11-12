@@ -8,7 +8,7 @@ tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"1 · ",color:"gold",bold:true}
 tellraw @s ["",{text:"   a ► ",color:"gold",bold:true},{text:"Plantas de café en la selva y en las granjas de las aldeas.",color:"white"}]
 tellraw @s ["",{text:"   b ► ",color:"gold",bold:true},{text:"El granjero novato vende cerezas por esmeraldas.",color:"white"}]
 tellraw @s ["",{text:"   c ► ",color:"gold",bold:true},{text:"Siémbrelas en tierra o tierra labrada: 4 etapas hasta madurar.",color:"white"}]
-tellraw @s ["",{text:"   Una planta madura rinde 2 o 3 cerezas.",color:"gray"}]
+tellraw @s ["",{text:"   Una planta madura rinde 2 o 3 cerezas. No es mucho, cabrón: cultive varias.",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"2 · ",color:"gold",bold:true},{text:"Preparación del grano",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   Cerezas ",color:"red"},{text:"► ",color:"gray"},{text:"Tostado ",color:"gold"},{text:"► ",color:"gray"},{text:"2.º tostado ",color:"gold"},{text:"► ",color:"gray"},{text:"Molido",color:"yellow"}]
@@ -23,8 +23,8 @@ tellraw @s ["",{text:"   d ► ",color:"gold",bold:true},{text:"Caliéntela en h
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"4 · ",color:"gold",bold:true},{text:"Efectos",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   ♦ ",color:"gold"},{text:"Velocidad  ",color:"aqua"},{text:"♦ ",color:"gold"},{text:"Salto  ",color:"green"},{text:"♦ ",color:"gold"},{text:"Prisa minera",color:"yellow"}]
-tellraw @s ["",{text:"   Duran 1 minuto. De noche provoca insomnio hasta el amanecer.",color:"gray"}]
+tellraw @s ["",{text:"   Duran 1 minuto. De noche provoca insomnio: no dormirá hasta el amanecer, joputa.",color:"gray"}]
 tellraw @s ""
-tellraw @s ["",{text:" ☺ ",color:"green"},{text:"Consejo: ",color:"green",bold:true},{text:"tómelo en las horas de actividad",color:"gray",italic:true}]
+tellraw @s ["",{text:" ☺ ",color:"green"},{text:"Consejo: ",color:"green",bold:true},{text:"tómelo de día. De noche el café lo deja despierto como un cabrón",color:"gray",italic:true}]
 tellraw @s ["",{text:"▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",color:"dark_gray"}]
 tellraw @s ["",{text:" ",color:"white"},{text:"◄ Anterior",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 12"}},{text:"   ",color:"white"},{text:"☼ Índice",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}},{text:"   ",color:"white"},{text:"Siguiente ►",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 14"}}]

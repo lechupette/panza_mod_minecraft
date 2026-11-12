@@ -12,12 +12,12 @@ tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"2 · ",color:"gold",bold:true}
 tellraw @s ["",{text:"   vacío  ",color:"gray"},{text:"♥♥",color:"dark_red"},{text:"♥♥♥",color:"red"},{text:"♥♥♥♥♥",color:"gold"},{text:"  saciado",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"3 · ",color:"gold",bold:true},{text:"Gasto de energía",color:"yellow",bold:true}]
-tellraw @s ["",{text:"   Correr, saltar y recibir daño consumen saturación y alimentación.",color:"white"}]
+tellraw @s ["",{text:"   Correr, saltar y recibir daño gastan saturación y alimentación. Todo cuesta, cabrón.",color:"white"}]
 tellraw @s ["",{text:"   La grasa amarilla se cuenta aparte de estos 20 puntos.",color:"white"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"4 · ",color:"gold",bold:true},{text:"Comer sin hambre",color:"yellow",bold:true}]
-tellraw @s ["",{text:"   Con la barra llena, sostener un alimento basta para poder comerlo.",color:"white"}]
+tellraw @s ["",{text:"   Con la barra llena, sostener un alimento basta para comerlo. El estómago no es argumento.",color:"white"}]
 tellraw @s ""
-tellraw @s ["",{text:" ☺ ",color:"green"},{text:"Consejo: ",color:"green",bold:true},{text:"reponga fuerzas antes de los viajes largos",color:"gray",italic:true}]
+tellraw @s ["",{text:" ☺ ",color:"green"},{text:"Consejo: ",color:"green",bold:true},{text:"coma antes de los viajes largos. Morirse de hambre en medio del monte es de joputa",color:"gray",italic:true}]
 tellraw @s ["",{text:"▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",color:"dark_gray"}]
 tellraw @s ["",{text:" ",color:"white"},{text:"◄ Anterior",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 11"}},{text:"   ",color:"white"},{text:"☼ Índice",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}},{text:"   ",color:"white"},{text:"Siguiente ►",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 13"}}]
