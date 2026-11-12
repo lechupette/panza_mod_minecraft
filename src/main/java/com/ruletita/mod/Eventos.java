@@ -120,7 +120,7 @@ public final class Eventos {
         }
 
         // Diez niveles de hambre nativa más cinco niveles independientes de reserva.
-        int alimentacion = food / 2;
+        int alimentacion = (d.getBooleanOr("rz_lleno", false) ? 20 : food) / 2;
         int nivel = Math.max(0, Math.min(10, alimentacion)) + grasa;
         if (nivel != d.getIntOr("rz_nivel", -1) || grasa != d.getIntOr("rz_grasa_sync", -1)) {
             d.putInt("rz_nivel", nivel);

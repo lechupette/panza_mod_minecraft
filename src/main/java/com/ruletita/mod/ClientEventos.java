@@ -23,6 +23,7 @@ import java.util.Map;
 public final class ClientEventos {
     private static final Map<Integer, RenderState> RENDER_STATES = new HashMap<>();
     private static ClientLevel cachedLevel;
+    private static int cleanupTicks;
 
     private ClientEventos() { }
 
@@ -83,7 +84,10 @@ public final class ClientEventos {
             state.fat = fat;
         }
 
-        RENDER_STATES.keySet().removeIf(entityId -> level.getEntity(entityId) == null);
+        if (++cleanupTicks >= 40) {
+            cleanupTicks = 0;
+            RENDER_STATES.keySet().removeIf(entityId -> level.getEntity(entityId) == null);
+        }
     }
 
     static float smoothFat(int entityId) {
@@ -138,20 +142,51 @@ public final class ClientEventos {
         }
     }
 
-    private static void drawFatIcon(GuiGraphics graphics, int x, int y, boolean full) {
+    /** Rectángulo precalculado del icono: posición relativa, tamaño y carácter de color. */
+    private record Rect(int x, int y, int w, int h, char c) { }
+
+    private static final Rect[] ICON_RECTS = buildIconRects();
+
+    /** Agrupa píxeles contiguos del mismo color en pocos rectángulos (de ~200 llamadas a ~12 por icono). */
+    private static Rect[] buildIconRects() {
+        java.util.List<int[]> open = new java.util.ArrayList<>();      // {x, y, w, h, c}
+        java.util.List<Rect> done = new java.util.ArrayList<>();
         for (int row = 0; row < ICON.length; row++) {
             String line = ICON[row];
-            for (int col = 0; col < line.length(); col++) {
-                int color;
-                switch (line.charAt(col)) {
-                    case 'o' -> color = full ? 0xFF2E1F00 : 0xFF1F1A10;
-                    case 'f' -> color = full ? 0xFFE3A400 : 0xFF4A4330;
-                    case 'h' -> color = full ? 0xFFFFE58A : 0xFF4A4330;
-                    case 'b' -> color = full ? 0xFFF4E8C0 : 0xFF6A6455;
-                    default -> { continue; }
+            java.util.List<int[]> next = new java.util.ArrayList<>();
+            int col = 0;
+            while (col < line.length()) {
+                char c = line.charAt(col);
+                if (c == '.') { col++; continue; }
+                int end = col;
+                while (end < line.length() && line.charAt(end) == c) end++;
+                int w = end - col;
+                int[] match = null;
+                for (int[] r : open) {
+                    if (r[0] == col && r[2] == w && r[4] == c && r[1] + r[3] == row) { match = r; break; }
                 }
-                graphics.fill(x + col, y + row, x + col + 1, y + row + 1, color);
+                if (match != null) { match[3]++; open.remove(match); next.add(match); }
+                else next.add(new int[]{col, row, w, 1, c});
+                col = end;
             }
+            for (int[] r : open) done.add(new Rect(r[0], r[1], r[2], r[3], (char) r[4]));
+            open = next;
+        }
+        for (int[] r : open) done.add(new Rect(r[0], r[1], r[2], r[3], (char) r[4]));
+        return done.toArray(new Rect[0]);
+    }
+
+    private static int colorOf(char c, boolean full) {
+        return switch (c) {
+            case 'o' -> full ? 0xFF2E1F00 : 0xFF1F1A10;
+            case 'f', 'h' -> (c == 'h' && full) ? 0xFFFFE58A : (full ? 0xFFE3A400 : 0xFF4A4330);
+            default -> full ? 0xFFF4E8C0 : 0xFF6A6455;
+        };
+    }
+
+    private static void drawFatIcon(GuiGraphics graphics, int x, int y, boolean full) {
+        for (Rect r : ICON_RECTS) {
+            graphics.fill(x + r.x(), y + r.y(), x + r.x() + r.w(), y + r.y() + r.h(), colorOf(r.c(), full));
         }
     }
 
