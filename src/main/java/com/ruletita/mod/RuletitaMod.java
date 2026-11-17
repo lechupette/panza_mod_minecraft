@@ -88,7 +88,7 @@ public final class RuletitaMod {
     public static final RegistryObject<Item> CAFE_TOSTADO = simple("cafe_tostado", 64);
     public static final RegistryObject<Item> CAFE_TOSTADO2 = simple("cafe_tostado2", 64);
     public static final RegistryObject<Item> CAFE_MOLIDO = simple("cafe_molido", 64);
-    public static final RegistryObject<Item> TAZA = ITEMS.register("taza", () -> new TazaItem(props("taza").stacksTo(1)));
+    public static final RegistryObject<Item> TAZA = ITEMS.register("taza", () -> new TazaItem(props("taza").stacksTo(16)));
     public static final RegistryObject<Item> TAZA_AGUA = simple("taza_agua", 1);
     public static final RegistryObject<Item> TAZA_AGUA_CAFE = simple("taza_agua_cafe", 1);
     public static final RegistryObject<Item> TAZA_CAFE = ITEMS.register("taza_cafe", () -> new Item(props("taza_cafe").stacksTo(1)
