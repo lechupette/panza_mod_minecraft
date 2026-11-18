@@ -129,7 +129,7 @@ public final class RuletitaMod {
                             lookup.get(key).ifPresent(holder -> {
                                 ItemStack stack = new ItemStack(Items.PAINTING);
                                 CompoundTag tag = new CompoundTag();
-                                tag.putInt("kuadro", 1);
+                                tag.putString("kuadro", "1");
                                 stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
                                 stack.set(DataComponents.ITEM_NAME, Component.literal("Kuadro " + ww + "x" + hh));
                                 stack.set(DataComponents.PAINTING_VARIANT, holder);

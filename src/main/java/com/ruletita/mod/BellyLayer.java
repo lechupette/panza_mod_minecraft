@@ -64,7 +64,9 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
     }
 
     private static void nalga(PoseStack.Pose p, VertexConsumer vc, int light, float x0, float x1, float y0, float y1, float z0, float z1) {
-        float va = Math.max(26f, vOf(y0)), vb = Math.min(32f, vOf(y1));
+        // 31.5 y no 32: v=32 cae justo en el borde de la capa exterior de la skin (transparente),
+        // y la cara inferior de las nalgas se descartaba por completo.
+        float va = Math.max(26f, vOf(y0)), vb = Math.min(31.5f, vOf(y1));
         float ua = 33f, ub = 39f;
         q(p, vc, light, 0, 0, 1, x1, y0, z1, ua, va, x0, y0, z1, ub, va, x0, y1, z1, ub, vb, x1, y1, z1, ua, vb);
         q(p, vc, light, 0, 0, -1, x0, y0, z0, ua, va, x1, y0, z0, ub, va, x1, y1, z0, ub, vb, x0, y1, z0, ua, vb);

@@ -1,0 +1,37 @@
+{
+ "criteria": {
+  "entrar": {
+   "trigger": "minecraft:tick"
+  }
+ },
+ "rewards": {
+  "recipes": [
+   "ruletita:cafe_molido",
+   "ruletita:cafe_tostado2_campfire_cooking",
+   "ruletita:cafe_tostado2_smelting",
+   "ruletita:cafe_tostado2_smoking",
+   "ruletita:cafe_tostado_campfire_cooking",
+   "ruletita:cafe_tostado_smelting",
+   "ruletita:cafe_tostado_smoking",
+   "ruletita:formol",
+   "ruletita:frasco_formol",
+   "ruletita:frasco_pez_cod",
+   "ruletita:frasco_pez_globo",
+   "ruletita:frasco_pez_salmon",
+   "ruletita:frasco_pez_tropical",
+   "ruletita:frasco_vacio",
+   "ruletita:guia_estudiante",
+   "ruletita:pollo_carne",
+   "ruletita:pollo_carne_campfire_cooking",
+   "ruletita:pollo_carne_crudo",
+   "ruletita:pollo_carne_smelting",
+   "ruletita:pollo_carne_smoking",
+   "ruletita:taza",
+   "ruletita:taza_agua_cafe",
+   "ruletita:taza_cafe_campfire_cooking",
+   "ruletita:taza_cafe_smelting",
+   "ruletita:taza_cafe_smoking",
+   "kuadro:kuadro_1x1"
+  ]
+ }
+}

@@ -104,7 +104,9 @@ public final class Eventos {
         }
         d.putInt("rz_dec", dec);
 
-        if (sp.level().getDayTime() % 24000L < 12000L) d.putBoolean("rz_insomnio", false);
+        if (sp.level().getDayTime() % 24000L < 12000L && d.getBooleanOr("rz_insomnio", false)) {
+            d.putBoolean("rz_insomnio", false);
+        }
 
         // Comer con la barra llena: vanilla no lo permite. Mientras se sostiene comida con hambre 20,
         // se baja un punto el nivel para habilitar el consumo y se marca para contarlo como exceso.
@@ -182,9 +184,24 @@ public final class Eventos {
         return food != null && !food.canAlwaysEat() && stack.get(DataComponents.CONSUMABLE) != null;
     }
 
+    private static boolean esKuadro(ItemStack stack) {
+        if (!stack.is(net.minecraft.world.item.Items.PAINTING)) return false;
+        var custom = stack.get(DataComponents.CUSTOM_DATA);
+        return custom != null && custom.copyTag().contains("kuadro");
+    }
+
     public static boolean onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if (!(event.getEntity() instanceof ServerPlayer sp)) return false;
         ItemStack stack = event.getItemStack();
+        // Kuadro en la mano + clic derecho al aire: abre el selector de medida (sin escribir comandos).
+        if (esKuadro(stack) && sp.level().getServer() != null) {
+            var server = sp.level().getServer();
+            server.getCommands().performPrefixedCommand(
+                    server.createCommandSourceStack().withEntity(sp).withPosition(sp.position()),
+                    "function kuadro:menu");
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            return true;
+        }
         var food = stack.get(DataComponents.FOOD);
         if (food == null || stack.get(DataComponents.CONSUMABLE) == null) return false;
         if (food.canAlwaysEat() || sp.isUsingItem() || sp.getFoodData().getFoodLevel() < 20) return false;

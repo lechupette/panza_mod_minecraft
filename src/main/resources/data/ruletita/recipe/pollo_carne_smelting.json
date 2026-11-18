@@ -1,0 +1,10 @@
+{
+ "type": "minecraft:smelting",
+ "category": "food",
+ "ingredient": "ruletita:pollo_carne_crudo",
+ "result": {
+  "id": "ruletita:pollo_carne"
+ },
+ "experience": 0.35,
+ "cookingtime": 200
+}

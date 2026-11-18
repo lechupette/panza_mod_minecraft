@@ -17,7 +17,7 @@
   "count": 1,
   "components": {
    "minecraft:custom_data": {
-    "kuadro": 1
+    "kuadro": "1"
    },
    "minecraft:item_name": {
     "text": "Kuadro 1x1",

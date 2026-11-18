@@ -65,34 +65,38 @@ public final class ClientEventos {
         if (level == null) return;
 
         for (Player player : level.players()) {
-            int fat = 0;
             Team team = player.getTeam();
-            if (team != null) {
-                String name = team.getName();
-                if (name.startsWith("rzb")) {
-                    int separator = name.indexOf('f', 3);
-                    try {
-                        if (separator >= 0) {
-                            fat = Math.max(0, Math.min(5, Integer.parseInt(name.substring(separator + 1))));
-                        }
-                    } catch (NumberFormatException ignored) {
-                        fat = 0;
-                    }
-                }
-            }
-
             RenderState state = RENDER_STATES.get(player.getId());
             if (state == null) {
                 state = new RenderState();
                 RENDER_STATES.put(player.getId(), state);
             }
-            state.targetFat = fat;
-            state.fat = fat;
+            // Solo se vuelve a interpretar el nombre del equipo cuando cambia: antes se
+            // analizaba una cadena por jugador en cada tick.
+            if (team != state.lastTeam) {
+                state.lastTeam = team;
+                state.fat = parseFat(team);
+            }
+            state.targetFat = state.fat;
         }
 
         if (++cleanupTicks >= 40) {
             cleanupTicks = 0;
             RENDER_STATES.keySet().removeIf(entityId -> level.getEntity(entityId) == null);
+        }
+    }
+
+    /** Grasa (0-5) codificada en el nombre del equipo: rzb{nivel}f{grasa}. */
+    private static int parseFat(Team team) {
+        if (team == null) return 0;
+        String name = team.getName();
+        if (!name.startsWith("rzb")) return 0;
+        int separator = name.indexOf('f', 3);
+        if (separator < 0) return 0;
+        try {
+            return Math.max(0, Math.min(5, Integer.parseInt(name.substring(separator + 1))));
+        } catch (NumberFormatException ignored) {
+            return 0;
         }
     }
 
@@ -117,16 +121,29 @@ public final class ClientEventos {
      * Reserva adicional: cinco segmentos independientes, alineados debajo de la barra
      * nativa de hambre. Se dibuja con primitivas GUI ya disponibles, sin texturas ni ticks extra.
      */
-    // Icono de 9x8 con la forma del muslo de comida: o=contorno, f=carne, h=brillo, b=hueso.
-    private static final String[] ICON = {
-            "....ooo..",
-            "...offfo.",
-            "..ohffffo",
-            "..offfffo",
-            "..offfffo",
-            ".obofffo.",
-            "obbo.ooo.",
-            "oooo....."
+    // Copia píxel por píxel del muslo de hambre de vanilla (9x9), recoloreada en dorado.
+    // Igual que vanilla: primero el contorno vacío y, si hay grasa, el relleno encima.
+    private static final String[] EMPTY_GRID = {
+            "..oo.....",
+            ".oppo....",
+            "oppppo...",
+            "opppppo..",
+            ".oppppo..",
+            "..opppo..",
+            "...ooopoo",
+            "......opo",
+            "......oo."
+    };
+    private static final String[] FULL_GRID = {
+            ".........",
+            "..ab.....",
+            ".acad....",
+            ".baded...",
+            "..fgee...",
+            "...fgg...",
+            "......h..",
+            ".......i.",
+            "........."
     };
 
     private static void renderFatReserve(GuiGraphics graphics, DeltaTracker delta) {
@@ -145,21 +162,22 @@ public final class ClientEventos {
         int y = graphics.guiHeight() - 49 - (bubbles ? 10 : 0);
         int right = graphics.guiWidth() / 2 + 82;
         for (int i = 0; i < 5; i++) {
-            drawFatIcon(graphics, right - i * 8, y + 1, i < fat);
+            drawFatIcon(graphics, right - i * 8, y, i < fat);
         }
     }
 
     /** Rectángulo precalculado del icono: posición relativa, tamaño y carácter de color. */
     private record Rect(int x, int y, int w, int h, char c) { }
 
-    private static final Rect[] ICON_RECTS = buildIconRects();
+    private static final Rect[] EMPTY_RECTS = buildRects(EMPTY_GRID);
+    private static final Rect[] FULL_RECTS = buildRects(FULL_GRID);
 
-    /** Agrupa píxeles contiguos del mismo color en pocos rectángulos (de ~200 llamadas a ~12 por icono). */
-    private static Rect[] buildIconRects() {
+    /** Agrupa píxeles contiguos del mismo color en pocos rectángulos. */
+    private static Rect[] buildRects(String[] grid) {
         java.util.List<int[]> open = new java.util.ArrayList<>();      // {x, y, w, h, c}
         java.util.List<Rect> done = new java.util.ArrayList<>();
-        for (int row = 0; row < ICON.length; row++) {
-            String line = ICON[row];
+        for (int row = 0; row < grid.length; row++) {
+            String line = grid[row];
             java.util.List<int[]> next = new java.util.ArrayList<>();
             int col = 0;
             while (col < line.length()) {
@@ -183,18 +201,31 @@ public final class ClientEventos {
         return done.toArray(new Rect[0]);
     }
 
-    private static int colorOf(char c, boolean full) {
+    private static int colorOf(char c) {
         return switch (c) {
-            case 'o' -> full ? 0xFF2E1F00 : 0xFF1F1A10;
-            case 'f', 'h' -> (c == 'h' && full) ? 0xFFFFE58A : (full ? 0xFFE3A400 : 0xFF4A4330);
-            default -> full ? 0xFFF4E8C0 : 0xFF6A6455;
+            case 'o' -> 0xFF000000;   // contorno (igual que vanilla)
+            case 'p' -> 0xFF282828;   // fondo vacío (igual que vanilla)
+            case 'a' -> 0xFFD09522;
+            case 'b' -> 0xFFC68006;
+            case 'c' -> 0xFFEFD374;
+            case 'd' -> 0xFFE1B850;
+            case 'e' -> 0xFFDAA83B;
+            case 'f' -> 0xFFC47C00;
+            case 'g' -> 0xFFCF931E;
+            case 'h' -> 0xFFF6E187;
+            default -> 0xFFFFF4A0;    // 'i': punta del hueso
         };
     }
 
-    private static void drawFatIcon(GuiGraphics graphics, int x, int y, boolean full) {
-        for (Rect r : ICON_RECTS) {
-            graphics.fill(x + r.x(), y + r.y(), x + r.x() + r.w(), y + r.y() + r.h(), colorOf(r.c(), full));
+    private static void drawRects(GuiGraphics graphics, Rect[] rects, int x, int y) {
+        for (Rect r : rects) {
+            graphics.fill(x + r.x(), y + r.y(), x + r.x() + r.w(), y + r.y() + r.h(), colorOf(r.c()));
         }
+    }
+
+    private static void drawFatIcon(GuiGraphics graphics, int x, int y, boolean full) {
+        drawRects(graphics, EMPTY_RECTS, x, y);
+        if (full) drawRects(graphics, FULL_RECTS, x, y);
     }
 
     private static final class RenderState {
@@ -202,6 +233,7 @@ public final class ClientEventos {
         private int targetFat;
         private int fat;
         private long lastNanos;
+        private Team lastTeam;
 
         private RenderState() {
             this.currentFat = 0f;
