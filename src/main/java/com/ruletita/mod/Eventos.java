@@ -34,7 +34,7 @@ import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 
 /** Logica de servidor: alimentacion, grasa, cafe, insomnio y comandos de prueba. */
 public final class Eventos {
-    private static final int MAX_GRASA = 5;
+    private static final int MAX_GRASA = 7;
     private static final Identifier MOD_VELOCIDAD = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "grasa");
 
     private Eventos() { }
@@ -54,7 +54,7 @@ public final class Eventos {
                                     return 1;
                                 })))
                 .then(Commands.literal("grasa")
-                        .then(Commands.argument("niveles", IntegerArgumentType.integer(1, 5))
+                        .then(Commands.argument("niveles", IntegerArgumentType.integer(1, 7))
                                 .executes(context -> {
                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                     int amount = IntegerArgumentType.getInteger(context, "niveles");
@@ -122,7 +122,7 @@ public final class Eventos {
             food = sp.getFoodData().getFoodLevel();
         }
 
-        // Diez niveles de hambre nativa más cinco niveles independientes de reserva.
+        // Diez niveles de hambre nativa más siete niveles independientes de reserva (4 útiles + 3 de panza pura).
         int alimentacion = (d.getBooleanOr("rz_lleno", false) ? 20 : food) / 2;
         int nivel = Math.max(0, Math.min(10, alimentacion)) + grasa;
         if (nivel != d.getIntOr("rz_nivel", -1) || grasa != d.getIntOr("rz_grasa_sync", -1)) {
@@ -137,7 +137,7 @@ public final class Eventos {
             if (inst != null) {
                 inst.removeModifier(MOD_VELOCIDAD);
                 if (grasa > 0) {
-                    inst.addPermanentModifier(new AttributeModifier(MOD_VELOCIDAD, -0.05 * grasa, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                    inst.addPermanentModifier(new AttributeModifier(MOD_VELOCIDAD, -0.25 * grasa / MAX_GRASA, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                 }
             }
         }

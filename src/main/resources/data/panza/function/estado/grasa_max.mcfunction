@@ -1,1 +1,1 @@
-panza grasa 5
+panza grasa 7

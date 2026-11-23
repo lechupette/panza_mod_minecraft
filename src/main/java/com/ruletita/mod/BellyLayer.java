@@ -26,8 +26,8 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
         float fat = ClientEventos.smoothFat(state.id);
         Identifier skin = state.skin.body().texturePath();
         ModelPart body = this.getParentModel().root().getChild("body");
-        // Volumen base visible (0.25) + hasta 0.75 adicional con los 5 niveles de reserva.
-        final float t = 0.25f + 0.75f * Math.max(0f, Math.min(fat / 5f, 1f));
+        // Volumen base visible (0.25) + hasta 0.75 adicional con los 7 niveles de reserva.
+        final float t = 0.25f + 0.75f * Math.max(0f, Math.min(fat / 7f, 1f));
         pose.pushPose();
         body.translateAndRotate(pose);
         collector.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(skin), (p, vc) -> draw(p, vc, light, t));

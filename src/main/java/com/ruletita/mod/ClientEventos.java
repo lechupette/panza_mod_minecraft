@@ -86,7 +86,7 @@ public final class ClientEventos {
         }
     }
 
-    /** Grasa (0-5) codificada en el nombre del equipo: rzb{nivel}f{grasa}. */
+    /** Grasa (0-7) codificada en el nombre del equipo: rzb{nivel}f{grasa}. */
     private static int parseFat(Team team) {
         if (team == null) return 0;
         String name = team.getName();
@@ -94,7 +94,7 @@ public final class ClientEventos {
         int separator = name.indexOf('f', 3);
         if (separator < 0) return 0;
         try {
-            return Math.max(0, Math.min(5, Integer.parseInt(name.substring(separator + 1))));
+            return Math.max(0, Math.min(7, Integer.parseInt(name.substring(separator + 1))));
         } catch (NumberFormatException ignored) {
             return 0;
         }
@@ -118,7 +118,7 @@ public final class ClientEventos {
     }
 
     /**
-     * Reserva adicional: cinco segmentos independientes, alineados debajo de la barra
+     * Reserva adicional: siete segmentos independientes, alineados debajo de la barra
      * nativa de hambre. Se dibuja con primitivas GUI ya disponibles, sin texturas ni ticks extra.
      */
     // Copia píxel por píxel del muslo de hambre de vanilla (9x9), recoloreada en dorado.
@@ -161,8 +161,9 @@ public final class ClientEventos {
         boolean bubbles = player.isUnderWater() || player.getAirSupply() < player.getMaxAirSupply();
         int y = graphics.guiHeight() - 49 - (bubbles ? 10 : 0);
         int right = graphics.guiWidth() / 2 + 82;
-        for (int i = 0; i < 5; i++) {
-            drawFatIcon(graphics, right - i * 8, y, i < fat);
+        for (int i = 0; i < 7; i++) {
+            // Los primeros 4 son la zona útil (dorados); los últimos 3, panza pura (grasosos).
+            drawFatIcon(graphics, right - i * 8, y, i < fat, i >= 4);
         }
     }
 
@@ -201,6 +202,23 @@ public final class ClientEventos {
         return done.toArray(new Rect[0]);
     }
 
+    // Variante "grasosa" de la zona pura: marrón amarillento, con brillo.
+    private static int greasyColorOf(char c) {
+        return switch (c) {
+            case 'o' -> 0xFF000000;
+            case 'p' -> 0xFF282828;
+            case 'a' -> 0xFF8A6A10;
+            case 'b' -> 0xFF6E5208;
+            case 'c' -> 0xFFC9A63A;
+            case 'd' -> 0xFFA8832A;
+            case 'e' -> 0xFF957022;
+            case 'f' -> 0xFF5C4204;
+            case 'g' -> 0xFF80600F;
+            case 'h' -> 0xFFD9BC5A;
+            default -> 0xFFE6CE72;
+        };
+    }
+
     private static int colorOf(char c) {
         return switch (c) {
             case 'o' -> 0xFF000000;   // contorno (igual que vanilla)
@@ -217,15 +235,16 @@ public final class ClientEventos {
         };
     }
 
-    private static void drawRects(GuiGraphics graphics, Rect[] rects, int x, int y) {
+    private static void drawRects(GuiGraphics graphics, Rect[] rects, int x, int y, boolean greasy) {
         for (Rect r : rects) {
-            graphics.fill(x + r.x(), y + r.y(), x + r.x() + r.w(), y + r.y() + r.h(), colorOf(r.c()));
+            int color = greasy ? greasyColorOf(r.c()) : colorOf(r.c());
+            graphics.fill(x + r.x(), y + r.y(), x + r.x() + r.w(), y + r.y() + r.h(), color);
         }
     }
 
-    private static void drawFatIcon(GuiGraphics graphics, int x, int y, boolean full) {
-        drawRects(graphics, EMPTY_RECTS, x, y);
-        if (full) drawRects(graphics, FULL_RECTS, x, y);
+    private static void drawFatIcon(GuiGraphics graphics, int x, int y, boolean full, boolean greasy) {
+        drawRects(graphics, EMPTY_RECTS, x, y, false);
+        if (full) drawRects(graphics, FULL_RECTS, x, y, greasy);
     }
 
     private static final class RenderState {

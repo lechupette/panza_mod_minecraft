@@ -6,7 +6,7 @@ tellraw @s ["",{text:"▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬�
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"1 · ",color:"gold",bold:true},{text:"Dos escalas, un solo cuerpo",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   Alimentación  ",color:"white"},{text:"♥♥♥♥♥♥♥♥♥♥",color:"red"}]
-tellraw @s ["",{text:"   Grasa       ",color:"yellow"},{text:"♥♥♥♥♥",color:"gold"},{text:"  ← sobre la barra",color:"gray"}]
+tellraw @s ["",{text:"   Grasa       ",color:"yellow"},{text:"♥♥♥♥",color:"gold"},{text:"♥♥♥",color:"#8A6A10"},{text:"  ← sobre la barra",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"2 · ",color:"gold",bold:true},{text:"Cómo se acumula",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   Con la barra completa, cada alimento suma 1 nivel de grasa. Sí, joputa, comer de más tiene consecuencias.",color:"white"}]
@@ -18,15 +18,17 @@ tellraw @s ["",{text:"   b ► ",color:"gold",bold:true},{text:"Versión complet
 tellraw @s ["",{text:"   Se puede comer con la barra llena. El cocinado sacia más, cabrón.",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"4 · ",color:"gold",bold:true},{text:"Volumen según la grasa",color:"yellow",bold:true}]
-tellraw @s ["",{text:"   0  ",color:"gold",bold:true},{text:"",color:"gold"},{text:"♥♥♥♥♥",color:"dark_gray"},{text:"  Silueta normal",color:"white"}]
-tellraw @s ["",{text:"   1  ",color:"gold",bold:true},{text:"♥",color:"gold"},{text:"♥♥♥♥",color:"dark_gray"},{text:"  Leve redondez",color:"white"}]
-tellraw @s ["",{text:"   2  ",color:"gold",bold:true},{text:"♥♥",color:"gold"},{text:"♥♥♥",color:"dark_gray"},{text:"  Volumen moderado",color:"white"}]
-tellraw @s ["",{text:"   3  ",color:"gold",bold:true},{text:"♥♥♥",color:"gold"},{text:"♥♥",color:"dark_gray"},{text:"  Prominencia clara",color:"white"}]
-tellraw @s ["",{text:"   4  ",color:"gold",bold:true},{text:"♥♥♥♥",color:"gold"},{text:"♥",color:"dark_gray"},{text:"  Volumen muy evidente",color:"white"}]
-tellraw @s ["",{text:"   5  ",color:"gold",bold:true},{text:"♥♥♥♥♥",color:"gold"},{text:"",color:"dark_gray"},{text:"  Volumen máximo",color:"white"}]
+tellraw @s ["",{text:"   0  ",color:"gold",bold:true},{text:"♥♥♥♥♥♥♥",color:"dark_gray"},{text:"  Silueta normal",color:"white"}]
+tellraw @s ["",{text:"   1  ",color:"gold",bold:true},{text:"♥",color:"gold"},{text:"♥♥♥♥♥♥",color:"dark_gray"},{text:"  Leve redondez",color:"white"}]
+tellraw @s ["",{text:"   2  ",color:"gold",bold:true},{text:"♥♥",color:"gold"},{text:"♥♥♥♥♥",color:"dark_gray"},{text:"  Volumen moderado",color:"white"}]
+tellraw @s ["",{text:"   3  ",color:"gold",bold:true},{text:"♥♥♥",color:"gold"},{text:"♥♥♥♥",color:"dark_gray"},{text:"  Prominencia clara",color:"white"}]
+tellraw @s ["",{text:"   4  ",color:"gold",bold:true},{text:"♥♥♥♥",color:"gold"},{text:"♥♥♥",color:"dark_gray"},{text:"  Volumen muy evidente",color:"white"}]
+tellraw @s ["",{text:"   5  ",color:"gold",bold:true},{text:"♥♥♥♥",color:"gold"},{text:"♥",color:"#8A6A10"},{text:"♥♥",color:"dark_gray"},{text:"  Volumen notable",color:"white"}]
+tellraw @s ["",{text:"   6  ",color:"gold",bold:true},{text:"♥♥♥♥",color:"gold"},{text:"♥♥",color:"#8A6A10"},{text:"♥",color:"dark_gray"},{text:"  Volumen fuerte",color:"white"}]
+tellraw @s ["",{text:"   7  ",color:"gold",bold:true},{text:"♥♥♥♥",color:"gold"},{text:"♥♥♥",color:"#8A6A10"},{text:"  Volumen máximo",color:"white"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"5 · ",color:"gold",bold:true},{text:"Movimiento",color:"yellow",bold:true}]
-tellraw @s ["",{text:"   Cada nivel reduce la marcha un 5 %. Correr con cinco niveles es un acto de fe.",color:"white"}]
+tellraw @s ["",{text:"   Cada nivel reduce un poco la marcha. Correr con siete niveles es un acto de fe.",color:"white"}]
 tellraw @s ""
 tellraw @s ["",{text:" ☺ ",color:"green"},{text:"Consejo: ",color:"green",bold:true},{text:"el Departamento no recomienda comer pollo hasta reventar, joputa",color:"gray",italic:true},{text:" XD",color:"yellow",bold:true}]
 tellraw @s ["",{text:"▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",color:"dark_gray"}]
