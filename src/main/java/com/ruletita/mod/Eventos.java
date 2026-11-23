@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.stats.Stats;
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -167,20 +169,23 @@ public final class Eventos {
         int alimentacion = (d.getBooleanOr("rz_lleno", false) ? 20 : food) / 2;
         int nivel = Math.max(0, Math.min(10, alimentacion)) + grasa;
         // El nombre del equipo lleva todo el estado visible hacia el cliente (max. 16 caracteres).
-        String teamName = "rzb" + nivel + "f" + grasa + "m" + musculo + "p" + Math.min(9, progreso) + "t" + temporizador;
-        if (!teamName.equals(d.getStringOr("rz_team", ""))) {
-            d.putString("rz_team", teamName);
+        // Se compara una clave numerica; el nombre solo se arma cuando algo cambia.
+        int key = (((nivel * 8 + grasa) * 4 + musculo) * 10 + Math.min(9, progreso)) * 10 + temporizador;
+        if (key != d.getIntOr("rz_key", -1)) {
+            d.putInt("rz_key", key);
             d.putInt("rz_nivel", nivel);
-            asignarEquipo(sp, teamName);
+            asignarEquipo(sp, "rzb" + nivel + "f" + grasa + "m" + musculo + "p" + Math.min(9, progreso) + "t" + temporizador);
         }
 
-        if (grasa != d.getIntOr("rz_vel", -1)) {
-            d.putInt("rz_vel", grasa);
-            AttributeInstance inst = sp.getAttribute(Attributes.MOVEMENT_SPEED);
-            if (inst != null) {
+        AttributeInstance inst = sp.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (inst != null) {
+            AttributeModifier actual = inst.getModifier(MOD_VELOCIDAD);
+            double deseado = -0.25 * grasa / MAX_GRASA;
+            boolean cambiar = grasa == 0 ? actual != null : (actual == null || actual.amount() != deseado);
+            if (cambiar) {
                 inst.removeModifier(MOD_VELOCIDAD);
                 if (grasa > 0) {
-                    inst.addPermanentModifier(new AttributeModifier(MOD_VELOCIDAD, -0.25 * grasa / MAX_GRASA, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                    inst.addPermanentModifier(new AttributeModifier(MOD_VELOCIDAD, deseado, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                 }
             }
         }
@@ -198,6 +203,9 @@ public final class Eventos {
     }
 
     /** Diferencia con la lectura anterior de una estadistica; 0 la primera vez o si se reinició. */
+    private static Block[] bloquesPesados;
+    private static int[] pesoBloques;
+
     private static int delta(CompoundTag d, String key, int current) {
         int last = d.getIntOr(key, -1);
         d.putInt(key, current);
@@ -228,8 +236,21 @@ public final class Eventos {
         int walk = delta(d, "rz_st_walk", stats.getValue(Stats.CUSTOM, Stats.WALK_ONE_CM));
         int jumps = delta(d, "rz_st_jump", stats.getValue(Stats.CUSTOM, Stats.JUMP));
         int damage = delta(d, "rz_st_dmg", stats.getValue(Stats.CUSTOM, Stats.DAMAGE_DEALT));
+        if (pesoBloques == null) {
+            // Peso por dureza (una sola vez): pasto, flores y antorchas no suman; la piedra y los minerales si.
+            var lista = new java.util.ArrayList<Block>();
+            var pesos = new java.util.ArrayList<Integer>();
+            for (var block : BuiltInRegistries.BLOCK) {
+                int peso = (int) Math.min(12f, block.defaultBlockState().getDestroySpeed(sp.level(), BlockPos.ZERO) * 4f);
+                if (peso > 0) { lista.add(block); pesos.add(peso); }
+            }
+            bloquesPesados = lista.toArray(new Block[0]);
+            pesoBloques = pesos.stream().mapToInt(Integer::intValue).toArray();
+        }
         int mined = 0;
-        for (var block : BuiltInRegistries.BLOCK) mined += stats.getValue(Stats.BLOCK_MINED, block);
+        for (int i = 0; i < bloquesPesados.length; i++) {
+            mined += stats.getValue(Stats.BLOCK_MINED, bloquesPesados[i]) * pesoBloques[i];
+        }
         mined = delta(d, "rz_st_mined", mined);
 
         int ventana = d.getIntOr("rz_cap_t", 0) + 1;
@@ -242,10 +263,11 @@ public final class Eventos {
         }
         d.putInt("rz_cap_t", ventana);
 
-        if (musculo >= MAX_MUSCULO) return grasa;
+        // Los contadores ya se actualizaron arriba: asi, al volver a supervivencia no cae un salto de golpe.
+        if (musculo >= MAX_MUSCULO || sp.isCreative() || sp.isSpectator()) return grasa;
         int puntos = 0;
         puntos += acumular(d, "rz_cap_run", sprint / 100, TOPE_CORRER);
-        puntos += acumular(d, "rz_cap_mine", mined * 6, TOPE_MINAR);
+        puntos += acumular(d, "rz_cap_mine", mined, TOPE_MINAR);
         puntos += acumular(d, "rz_cap_hit", damage * 3 / 10, TOPE_PELEAR);
         // Saltar solo cuenta si ademas te moves: saltar en el lugar no suma.
         if (sprint + walk >= 100) puntos += acumular(d, "rz_cap_jump", jumps * 2, TOPE_SALTAR);

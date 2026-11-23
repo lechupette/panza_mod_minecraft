@@ -182,7 +182,10 @@ public final class ClientEventos {
         // Músculo: 3 bíceps sobre la barra de corazones (y la armadura). El próximo se llena con el
         // entrenamiento; si no hay grasa útil queda apagado, porque no hay combustible.
         int left = graphics.guiWidth() / 2 - 91;
-        int my = graphics.guiHeight() - 59;
+        // Mismo cálculo que vanilla para las filas de corazones (vida extra / absorción) y la armadura.
+        int heartRows = (int) Math.ceil((player.getMaxHealth() + Math.ceil(player.getAbsorptionAmount())) / 20.0);
+        int rowHeight = Math.max(10 - (heartRows - 2), 3);
+        int my = graphics.guiHeight() - 49 - (heartRows - 1) * rowHeight - (player.getArmorValue() > 0 ? 10 : 0);
         for (int i = 0; i < 3; i++) {
             drawRects(graphics, BICEP_EMPTY_RECTS, left + i * 8, my, 0, 0);
             if (i < muscle) {
