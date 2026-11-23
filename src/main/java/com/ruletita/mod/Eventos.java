@@ -5,6 +5,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.stats.Stats;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -35,6 +37,17 @@ import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 /** Logica de servidor: alimentacion, grasa, cafe, insomnio y comandos de prueba. */
 public final class Eventos {
     private static final int MAX_GRASA = 7;
+    // Grasa 1..4 = util (alimenta el musculo); 5..7 = panza pura.
+    private static final int GRASA_UTIL = 4;
+    // Cada cuantos ticks baja 1 nivel de grasa (15 min en zona util, mas lento en zona pura).
+    private static final int DECAY_UTIL = 18000;
+    private static final int DECAY_PURA = 30000;
+    // Musculo: niveles y puntos de entrenamiento por nivel (~30 min de juego activo).
+    private static final int MAX_MUSCULO = 3;
+    private static final int PUNTOS_NIVEL = 9000;
+    // Tope de puntos por minuto y por fuente, para que no se pueda farmear una sola cosa.
+    private static final int POLLS_VENTANA = 60;
+    private static final int TOPE_CORRER = 400, TOPE_MINAR = 360, TOPE_PELEAR = 300, TOPE_SALTAR = 120;
     private static final Identifier MOD_VELOCIDAD = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "grasa");
 
     private Eventos() { }
@@ -67,6 +80,28 @@ public final class Eventos {
                                             true);
                                     return 1;
                                 })))
+                .then(Commands.literal("musculo")
+                        .then(Commands.argument("nivel", IntegerArgumentType.integer(0, MAX_MUSCULO))
+                                .executes(context -> {
+                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    int nivel = IntegerArgumentType.getInteger(context, "nivel");
+                                    player.getPersistentData().putInt("rz_musc", nivel);
+                                    player.getPersistentData().putInt("rz_mpts", 0);
+                                    context.getSource().sendSuccess(
+                                            () -> Component.literal("Musculo: " + nivel + " / " + MAX_MUSCULO + "."), true);
+                                    return 1;
+                                })))
+                .then(Commands.literal("estado")
+                        .executes(context -> {
+                            ServerPlayer player = context.getSource().getPlayerOrException();
+                            CompoundTag data = player.getPersistentData();
+                            String texto = "Nivel visual: " + data.getIntOr("rz_nivel", 0) + " / " + (10 + MAX_GRASA)
+                                    + " · Grasa: " + data.getIntOr("rz_grasa", 0) + " / " + MAX_GRASA
+                                    + " · Musculo: " + data.getIntOr("rz_musc", 0) + " / " + MAX_MUSCULO
+                                    + " (progreso " + data.getIntOr("rz_mpts", 0) + " / " + PUNTOS_NIVEL + ")";
+                            context.getSource().sendSuccess(() -> Component.literal(texto), false);
+                            return 1;
+                        }))
                 .then(Commands.literal("limpiar_grasa")
                         .executes(context -> {
                             ServerPlayer player = context.getSource().getPlayerOrException();
@@ -95,7 +130,7 @@ public final class Eventos {
         d.putInt("rz_cd", cd);
 
         int dec = d.getIntOr("rz_dec", 0) + 1;
-        if (dec >= 6000) {
+        if (dec >= (grasa > GRASA_UTIL ? DECAY_PURA : DECAY_UTIL)) {
             dec = 0;
             if (grasa > 0) {
                 grasa--;
@@ -103,6 +138,12 @@ public final class Eventos {
             }
         }
         d.putInt("rz_dec", dec);
+
+        grasa = entrenar(sp, d, grasa);
+        int musculo = d.getIntOr("rz_musc", 0);
+        int progreso = d.getIntOr("rz_mpts", 0) * 10 / PUNTOS_NIVEL;
+        int decayLimit = grasa > GRASA_UTIL ? DECAY_PURA : DECAY_UTIL;
+        int temporizador = grasa > 0 ? Math.min(9, dec * 10 / decayLimit) : 0;
 
         if (sp.level().getDayTime() % 24000L < 12000L && d.getBooleanOr("rz_insomnio", false)) {
             d.putBoolean("rz_insomnio", false);
@@ -125,10 +166,12 @@ public final class Eventos {
         // Diez niveles de hambre nativa más siete niveles independientes de reserva (4 útiles + 3 de panza pura).
         int alimentacion = (d.getBooleanOr("rz_lleno", false) ? 20 : food) / 2;
         int nivel = Math.max(0, Math.min(10, alimentacion)) + grasa;
-        if (nivel != d.getIntOr("rz_nivel", -1) || grasa != d.getIntOr("rz_grasa_sync", -1)) {
+        // El nombre del equipo lleva todo el estado visible hacia el cliente (max. 16 caracteres).
+        String teamName = "rzb" + nivel + "f" + grasa + "m" + musculo + "p" + Math.min(9, progreso) + "t" + temporizador;
+        if (!teamName.equals(d.getStringOr("rz_team", ""))) {
+            d.putString("rz_team", teamName);
             d.putInt("rz_nivel", nivel);
-            d.putInt("rz_grasa_sync", grasa);
-            asignarEquipo(sp, nivel, grasa);
+            asignarEquipo(sp, teamName);
         }
 
         if (grasa != d.getIntOr("rz_vel", -1)) {
@@ -154,11 +197,79 @@ public final class Eventos {
         level.sendParticles(new DustParticleOptions(0xC9A227, 1.4f), sp.getX(), sp.getY() + 0.6, sp.getZ(), 5, 0.25, 0.12, 0.25, 0.01);
     }
 
-    private static void asignarEquipo(ServerPlayer sp, int nivel, int grasa) {
+    /** Diferencia con la lectura anterior de una estadistica; 0 la primera vez o si se reinició. */
+    private static int delta(CompoundTag d, String key, int current) {
+        int last = d.getIntOr(key, -1);
+        d.putInt(key, current);
+        if (last < 0 || current < last) return 0;
+        return current - last;
+    }
+
+    /** Suma puntos a una fuente sin pasar su tope de la ventana actual. */
+    private static int acumular(CompoundTag d, String key, int puntos, int tope) {
+        int usado = d.getIntOr(key, 0);
+        int ok = Math.max(0, Math.min(puntos, tope - usado));
+        d.putInt(key, usado + ok);
+        return ok;
+    }
+
+    /**
+     * Entrenamiento por actividad normal (correr, minar, pegar, saltar), leido de las
+     * estadisticas del jugador una vez por segundo. Convierte grasa util en musculo.
+     * Devuelve la grasa resultante.
+     */
+    private static int entrenar(ServerPlayer sp, CompoundTag d, int grasa) {
+        int musculo = Math.max(0, Math.min(MAX_MUSCULO, d.getIntOr("rz_musc", 0)));
+        if (musculo != d.getIntOr("rz_musc", 0)) d.putInt("rz_musc", musculo);
+        if (sp.tickCount % 20 != 0) return grasa;
+
+        var stats = sp.getStats();
+        int sprint = delta(d, "rz_st_sprint", stats.getValue(Stats.CUSTOM, Stats.SPRINT_ONE_CM));
+        int walk = delta(d, "rz_st_walk", stats.getValue(Stats.CUSTOM, Stats.WALK_ONE_CM));
+        int jumps = delta(d, "rz_st_jump", stats.getValue(Stats.CUSTOM, Stats.JUMP));
+        int damage = delta(d, "rz_st_dmg", stats.getValue(Stats.CUSTOM, Stats.DAMAGE_DEALT));
+        int mined = 0;
+        for (var block : BuiltInRegistries.BLOCK) mined += stats.getValue(Stats.BLOCK_MINED, block);
+        mined = delta(d, "rz_st_mined", mined);
+
+        int ventana = d.getIntOr("rz_cap_t", 0) + 1;
+        if (ventana >= POLLS_VENTANA) {
+            ventana = 0;
+            d.putInt("rz_cap_run", 0);
+            d.putInt("rz_cap_mine", 0);
+            d.putInt("rz_cap_hit", 0);
+            d.putInt("rz_cap_jump", 0);
+        }
+        d.putInt("rz_cap_t", ventana);
+
+        if (musculo >= MAX_MUSCULO) return grasa;
+        int puntos = 0;
+        puntos += acumular(d, "rz_cap_run", sprint / 100, TOPE_CORRER);
+        puntos += acumular(d, "rz_cap_mine", mined * 6, TOPE_MINAR);
+        puntos += acumular(d, "rz_cap_hit", damage * 3 / 10, TOPE_PELEAR);
+        // Saltar solo cuenta si ademas te moves: saltar en el lugar no suma.
+        if (sprint + walk >= 100) puntos += acumular(d, "rz_cap_jump", jumps * 2, TOPE_SALTAR);
+
+        // Sin grasa util no hay combustible; con mas grasa util rinde mas (40 %..100 %).
+        int util = Math.min(grasa, GRASA_UTIL);
+        if (util <= 0 || puntos <= 0) return grasa;
+        int pts = d.getIntOr("rz_mpts", 0) + puntos * (2 + 2 * util) / 10;
+        if (pts >= PUNTOS_NIVEL) {
+            pts = 0;
+            musculo++;
+            grasa--;
+            d.putInt("rz_musc", musculo);
+            d.putInt("rz_grasa", grasa);
+            sp.displayClientMessage(Component.literal("Tus musculos te agradecen la grasa"), true);
+        }
+        d.putInt("rz_mpts", pts);
+        return grasa;
+    }
+
+    private static void asignarEquipo(ServerPlayer sp, String name) {
         MinecraftServer server = sp.level().getServer();
         if (server == null) return;
         Scoreboard scoreboard = server.getScoreboard();
-        String name = "rzb" + nivel + "f" + grasa;
         PlayerTeam team = scoreboard.getPlayerTeam(name);
         if (team == null) team = scoreboard.addPlayerTeam(name);
         scoreboard.addPlayerToTeam(sp.getScoreboardName(), team);

@@ -75,7 +75,10 @@ public final class ClientEventos {
             // analizaba una cadena por jugador en cada tick.
             if (team != state.lastTeam) {
                 state.lastTeam = team;
-                state.fat = parseFat(team);
+                state.fat = parseField(team, 'f', 7);
+                state.muscle = parseField(team, 'm', 3);
+                state.progress = parseField(team, 'p', 9);
+                state.timer = parseField(team, 't', 9);
             }
             state.targetFat = state.fat;
         }
@@ -86,15 +89,18 @@ public final class ClientEventos {
         }
     }
 
-    /** Grasa (0-7) codificada en el nombre del equipo: rzb{nivel}f{grasa}. */
-    private static int parseFat(Team team) {
+    /** Campo numérico del nombre del equipo: rzb{nivel}f{grasa}m{músculo}p{progreso}t{temporizador}. */
+    private static int parseField(Team team, char key, int max) {
         if (team == null) return 0;
         String name = team.getName();
         if (!name.startsWith("rzb")) return 0;
-        int separator = name.indexOf('f', 3);
-        if (separator < 0) return 0;
+        int start = name.indexOf(key, 3);
+        if (start < 0) return 0;
+        int end = start + 1;
+        while (end < name.length() && Character.isDigit(name.charAt(end))) end++;
+        if (end == start + 1) return 0;
         try {
-            return Math.max(0, Math.min(7, Integer.parseInt(name.substring(separator + 1))));
+            return Math.max(0, Math.min(max, Integer.parseInt(name.substring(start + 1, end))));
         } catch (NumberFormatException ignored) {
             return 0;
         }
@@ -155,6 +161,9 @@ public final class ClientEventos {
 
         RenderState state = RENDER_STATES.get(player.getId());
         int fat = state == null ? 0 : state.fat;
+        int muscle = state == null ? 0 : state.muscle;
+        int progress = state == null ? 0 : state.progress;
+        int timer = state == null ? 0 : state.timer;
 
         // Fila de grasa justo sobre la barra de hambre. Bajo el agua, las burbujas ocupan esa fila:
         // la grasa sube una fila más para que nunca se mezclen.
@@ -163,7 +172,24 @@ public final class ClientEventos {
         int right = graphics.guiWidth() / 2 + 82;
         for (int i = 0; i < 7; i++) {
             // Los primeros 4 son la zona útil (dorados); los últimos 3, panza pura (grasosos).
-            drawFatIcon(graphics, right - i * 8, y, i < fat, i >= 4);
+            boolean full = i < fat;
+            // La grasa que está por bajar se vacía de abajo hacia arriba y titila al final.
+            int cutoff = (full && i == fat - 1) ? timer : 0;
+            if (full && i == fat - 1 && timer >= 8 && (System.currentTimeMillis() / 500L) % 2L == 0L) cutoff = 9;
+            drawFatIcon(graphics, right - i * 8, y, full, i >= 4, cutoff);
+        }
+
+        // Músculo: 3 bíceps sobre la barra de corazones (y la armadura). El próximo se llena con el
+        // entrenamiento; si no hay grasa útil queda apagado, porque no hay combustible.
+        int left = graphics.guiWidth() / 2 - 91;
+        int my = graphics.guiHeight() - 59;
+        for (int i = 0; i < 3; i++) {
+            drawRects(graphics, BICEP_EMPTY_RECTS, left + i * 8, my, 0, 0);
+            if (i < muscle) {
+                drawRects(graphics, BICEP_FULL_RECTS, left + i * 8, my, 2, 0);
+            } else if (i == muscle) {
+                drawRects(graphics, BICEP_FULL_RECTS, left + i * 8, my, fat > 0 ? 2 : 3, 9 - progress);
+            }
         }
     }
 
@@ -235,22 +261,71 @@ public final class ClientEventos {
         };
     }
 
-    private static void drawRects(GuiGraphics graphics, Rect[] rects, int x, int y, boolean greasy) {
+    // Bíceps (9x9): contorno y relleno, mismo sistema de rectángulos que el muslo.
+    private static final String[] BICEP_EMPTY = {
+            "......oo.",
+            ".....opo.",
+            ".oo.oppo.",
+            "opppoppo.",
+            "oppppppo.",
+            ".opppppo.",
+            "..oppppo.",
+            "...opppo.",
+            "....ooo.."
+    };
+    private static final String[] BICEP_FULL = {
+            ".........",
+            "......a..",
+            ".....ab..",
+            ".cad.ab..",
+            ".caadab..",
+            "..caabb..",
+            "...aabb..",
+            "....abb..",
+            "........."
+    };
+    private static final Rect[] BICEP_EMPTY_RECTS = buildRects(BICEP_EMPTY);
+    private static final Rect[] BICEP_FULL_RECTS = buildRects(BICEP_FULL);
+
+    private static int bicepColorOf(char c, boolean dim) {
+        return switch (c) {
+            case 'o' -> 0xFF000000;
+            case 'p' -> 0xFF282828;
+            case 'a' -> dim ? 0xFF5A5A5A : 0xFFC8442E;
+            case 'b' -> dim ? 0xFF484848 : 0xFFA83320;
+            case 'c' -> dim ? 0xFF787878 : 0xFFE8806A;
+            default -> dim ? 0xFF666666 : 0xFFD65A40;
+        };
+    }
+
+    /** mode: 0 = dorado, 1 = grasoso, 2 = bíceps, 3 = bíceps apagado. Solo se dibujan las filas >= fromRow. */
+    private static void drawRects(GuiGraphics graphics, Rect[] rects, int x, int y, int mode, int fromRow) {
         for (Rect r : rects) {
-            int color = greasy ? greasyColorOf(r.c()) : colorOf(r.c());
-            graphics.fill(x + r.x(), y + r.y(), x + r.x() + r.w(), y + r.y() + r.h(), color);
+            int top = Math.max(r.y(), fromRow);
+            int bottom = r.y() + r.h();
+            if (top >= bottom) continue;
+            int color = switch (mode) {
+                case 1 -> greasyColorOf(r.c());
+                case 2 -> bicepColorOf(r.c(), false);
+                case 3 -> bicepColorOf(r.c(), true);
+                default -> colorOf(r.c());
+            };
+            graphics.fill(x + r.x(), y + top, x + r.x() + r.w(), y + bottom, color);
         }
     }
 
-    private static void drawFatIcon(GuiGraphics graphics, int x, int y, boolean full, boolean greasy) {
-        drawRects(graphics, EMPTY_RECTS, x, y, false);
-        if (full) drawRects(graphics, FULL_RECTS, x, y, greasy);
+    private static void drawFatIcon(GuiGraphics graphics, int x, int y, boolean full, boolean greasy, int fromRow) {
+        drawRects(graphics, EMPTY_RECTS, x, y, 0, 0);
+        if (full) drawRects(graphics, FULL_RECTS, x, y, greasy ? 1 : 0, fromRow);
     }
 
     private static final class RenderState {
         private float currentFat;
         private int targetFat;
         private int fat;
+        private int muscle;
+        private int progress;
+        private int timer;
         private long lastNanos;
         private Team lastTeam;
 
