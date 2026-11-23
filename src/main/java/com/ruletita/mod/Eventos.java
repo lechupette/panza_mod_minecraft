@@ -244,7 +244,6 @@ public final class Eventos {
                 int previousFat = data.getIntOr("rz_grasa", 0);
                 if (previousFat < MAX_GRASA) {
                     data.putInt("rz_grasa", previousFat + 1);
-                    sp.displayClientMessage(Component.literal("Grasa: " + (previousFat + 1) + " / " + MAX_GRASA), true);
                 }
             }
         }
