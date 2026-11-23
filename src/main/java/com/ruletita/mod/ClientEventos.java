@@ -107,6 +107,11 @@ public final class ClientEventos {
         }
     }
 
+    static int muscleOf(int entityId) {
+        RenderState state = RENDER_STATES.get(entityId);
+        return state == null ? 0 : state.muscle;
+    }
+
     static float smoothFat(int entityId) {
         RenderState state = RENDER_STATES.get(entityId);
         if (state == null) return 0f;
