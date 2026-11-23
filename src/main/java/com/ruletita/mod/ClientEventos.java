@@ -79,6 +79,7 @@ public final class ClientEventos {
                 state.muscle = parseField(team, 'm', 3);
                 state.progress = parseField(team, 'p', 9);
                 state.timer = parseField(team, 't', 9);
+                state.warn = parseField(team, 'w', 1);
             }
             state.targetFat = state.fat;
         }
@@ -164,6 +165,7 @@ public final class ClientEventos {
         int muscle = state == null ? 0 : state.muscle;
         int progress = state == null ? 0 : state.progress;
         int timer = state == null ? 0 : state.timer;
+        boolean warn = state != null && state.warn == 1;
 
         // Fila de grasa justo sobre la barra de hambre. Bajo el agua, las burbujas ocupan esa fila:
         // la grasa sube una fila más para que nunca se mezclen.
@@ -188,6 +190,9 @@ public final class ClientEventos {
         int my = graphics.guiHeight() - 49 - (heartRows - 1) * rowHeight - (player.getArmorValue() > 0 ? 10 : 0);
         for (int i = 0; i < 3; i++) {
             drawRects(graphics, BICEP_EMPTY_RECTS, left + i * 8, my, 0, 0);
+            // Aviso de pérdida: el último bíceps titila si la panza se está comiendo el músculo.
+            boolean apagado = warn && i == muscle - 1 && (System.currentTimeMillis() / 400L) % 2L == 0L;
+            if (apagado) continue;
             if (i < muscle) {
                 drawRects(graphics, BICEP_FULL_RECTS, left + i * 8, my, 2, 0);
             } else if (i == muscle) {
@@ -329,6 +334,7 @@ public final class ClientEventos {
         private int muscle;
         private int progress;
         private int timer;
+        private int warn;
         private long lastNanos;
         private Team lastTeam;
 

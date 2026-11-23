@@ -27,6 +27,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -151,6 +152,7 @@ public final class RuletitaMod {
         TickEvent.PlayerTickEvent.Post.BUS.addListener(Eventos::onPlayerTick);
         LivingEntityUseItemEvent.Start.BUS.addListener(Eventos::onUseStart);
         LivingEntityUseItemEvent.Finish.BUS.addListener(Eventos::onUseFinish);
+        LivingDeathEvent.BUS.addListener(Eventos::onLivingDeath);
         PlayerInteractEvent.RightClickItem.BUS.addListener(Eventos::onRightClickItem);
         PlayerSleepInBedEvent.BUS.addListener(Eventos::onSleep);
         net.minecraftforge.event.village.VillagerTradesEvent.BUS.addListener(Eventos::onVillagerTrades);

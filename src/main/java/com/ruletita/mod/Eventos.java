@@ -5,6 +5,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.stats.Stats;
@@ -32,6 +33,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -49,6 +51,13 @@ public final class Eventos {
     private static final int PUNTOS_NIVEL = 9000;
     // Tope de puntos por minuto y por fuente, para que no se pueda farmear una sola cosa.
     private static final int POLLS_VENTANA = 60;
+    // Puntos de nutricion de comida (estando lleno) que hacen falta para 1 nivel de grasa.
+    private static final int NUTRICION_POR_GRASA = 6;
+    // Zona pura sin entrenar: segundos hasta perder 1 nivel de musculo, y desde cuando avisa.
+    private static final int LIMITE_PURA = 1200;
+    private static final int AVISO_PURA = 900;
+    // Vida con la que te deja un biceps al salvarte (4 = 2 corazones).
+    private static final float VIDA_SEGURO = 4f;
     private static final int TOPE_CORRER = 400, TOPE_MINAR = 360, TOPE_PELEAR = 300, TOPE_SALTAR = 120;
     private static final Identifier MOD_VELOCIDAD = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "grasa");
 
@@ -170,11 +179,12 @@ public final class Eventos {
         int nivel = Math.max(0, Math.min(10, alimentacion)) + grasa;
         // El nombre del equipo lleva todo el estado visible hacia el cliente (max. 16 caracteres).
         // Se compara una clave numerica; el nombre solo se arma cuando algo cambia.
-        int key = (((nivel * 8 + grasa) * 4 + musculo) * 10 + Math.min(9, progreso)) * 10 + temporizador;
+        int aviso = d.getIntOr("rz_warn", 0);
+        int key = ((((nivel * 8 + grasa) * 4 + musculo) * 10 + Math.min(9, progreso)) * 10 + temporizador) * 2 + aviso;
         if (key != d.getIntOr("rz_key", -1)) {
             d.putInt("rz_key", key);
             d.putInt("rz_nivel", nivel);
-            asignarEquipo(sp, "rzb" + nivel + "f" + grasa + "m" + musculo + "p" + Math.min(9, progreso) + "t" + temporizador);
+            asignarEquipo(sp, "rzb" + nivel + "f" + grasa + "m" + musculo + "p" + Math.min(9, progreso) + "t" + temporizador + "w" + aviso);
         }
 
         AttributeInstance inst = sp.getAttribute(Attributes.MOVEMENT_SPEED);
@@ -224,7 +234,8 @@ public final class Eventos {
     /**
      * Entrenamiento por actividad normal (correr, minar, pegar, saltar), leido de las
      * estadisticas del jugador una vez por segundo. Convierte grasa util en musculo.
-     * Devuelve la grasa resultante.
+     * Hacer varias cosas a la vez rinde mas; repetir una sola durante minutos, menos.
+     * En zona pura sin entrenar el musculo se va perdiendo. Devuelve la grasa resultante.
      */
     private static int entrenar(ServerPlayer sp, CompoundTag d, int grasa) {
         int musculo = Math.max(0, Math.min(MAX_MUSCULO, d.getIntOr("rz_musc", 0)));
@@ -256,6 +267,17 @@ public final class Eventos {
         int ventana = d.getIntOr("rz_cap_t", 0) + 1;
         if (ventana >= POLLS_VENTANA) {
             ventana = 0;
+            // Cansancio por repetir: minutos seguidos usando una sola fuente (correr, minar o pegar).
+            int r = d.getIntOr("rz_cap_run", 0) > 0 ? 1 : 0;
+            int m = d.getIntOr("rz_cap_mine", 0) > 0 ? 1 : 0;
+            int h = d.getIntOr("rz_cap_hit", 0) > 0 ? 1 : 0;
+            int fuente = (r + m + h == 1) ? (r == 1 ? 1 : (m == 1 ? 2 : 3)) : 0;
+            int racha = fuente == 0 ? 0 : (fuente == d.getIntOr("rz_fat_src", 0) ? d.getIntOr("rz_fat_n", 0) + 1 : 1);
+            d.putInt("rz_fat_src", fuente);
+            d.putInt("rz_fat_n", racha);
+            if (racha == 5 && !sp.isCreative() && !sp.isSpectator()) {
+                sp.displayClientMessage(Component.literal("Tu cuerpo pide variedad: hace otra cosa un rato"), true);
+            }
             d.putInt("rz_cap_run", 0);
             d.putInt("rz_cap_mine", 0);
             d.putInt("rz_cap_hit", 0);
@@ -264,7 +286,8 @@ public final class Eventos {
         d.putInt("rz_cap_t", ventana);
 
         // Los contadores ya se actualizaron arriba: asi, al volver a supervivencia no cae un salto de golpe.
-        if (musculo >= MAX_MUSCULO || sp.isCreative() || sp.isSpectator()) return grasa;
+        if (sp.isCreative() || sp.isSpectator()) return grasa;
+
         int puntos = 0;
         puntos += acumular(d, "rz_cap_run", sprint / 100, TOPE_CORRER);
         puntos += acumular(d, "rz_cap_mine", mined, TOPE_MINAR);
@@ -272,10 +295,36 @@ public final class Eventos {
         // Saltar solo cuenta si ademas te moves: saltar en el lugar no suma.
         if (sprint + walk >= 100) puntos += acumular(d, "rz_cap_jump", jumps * 2, TOPE_SALTAR);
 
+        // Zona pura sin entrenar: el musculo se va perdiendo; entrenar frena la cuenta.
+        int pura = d.getIntOr("rz_pura", 0);
+        if (grasa > GRASA_UTIL && musculo > 0) {
+            pura = puntos > 0 ? Math.max(0, pura - 5) : pura + 1;
+            if (pura >= LIMITE_PURA) {
+                pura = 0;
+                musculo--;
+                d.putInt("rz_musc", musculo);
+                d.putInt("rz_mpts", 0);
+                sp.displayClientMessage(Component.literal("La panza se esta comiendo tus musculos"), true);
+            }
+        } else {
+            pura = 0;
+        }
+        d.putInt("rz_pura", pura);
+        d.putInt("rz_warn", (musculo > 0 && pura >= AVISO_PURA) ? 1 : 0);
+
+        if (musculo >= MAX_MUSCULO) return grasa;
+
+        // Variedad: 2 fuentes en el mismo minuto rinden mas, 3 todavia mas. Repetir una sola cansa.
+        int activas = (d.getIntOr("rz_cap_run", 0) > 0 ? 1 : 0) + (d.getIntOr("rz_cap_mine", 0) > 0 ? 1 : 0)
+                + (d.getIntOr("rz_cap_hit", 0) > 0 ? 1 : 0);
+        int variedad = activas >= 3 ? 150 : (activas == 2 ? 125 : 100);
+        int racha = d.getIntOr("rz_fat_n", 0);
+        int cansancio = racha >= 10 ? 50 : (racha >= 5 ? 70 : 100);
+
         // Sin grasa util no hay combustible; con mas grasa util rinde mas (40 %..100 %).
         int util = Math.min(grasa, GRASA_UTIL);
         if (util <= 0 || puntos <= 0) return grasa;
-        int pts = d.getIntOr("rz_mpts", 0) + puntos * (2 + 2 * util) / 10;
+        int pts = d.getIntOr("rz_mpts", 0) + puntos * variedad * cansancio * (2 + 2 * util) / 1000000;
         if (pts >= PUNTOS_NIVEL) {
             pts = 0;
             musculo++;
@@ -291,6 +340,32 @@ public final class Eventos {
         }
         d.putInt("rz_mpts", pts);
         return grasa;
+    }
+
+    /**
+     * Seguro de vida: si un golpe te iba a matar y tenes musculo, un biceps se gasta y volves con
+     * 2 corazones. Void y /kill no se pueden frenar. Si moris de verdad, la grasa se pierde y el
+     * musculo se conserva. El Totem de la inmortalidad actua antes, dentro de vanilla.
+     */
+    public static boolean onLivingDeath(LivingDeathEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer sp)) return false;
+        CompoundTag d = sp.getPersistentData();
+        int musculo = d.getIntOr("rz_musc", 0);
+        if (musculo > 0 && !event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            d.putInt("rz_musc", musculo - 1);
+            d.putInt("rz_mpts", 0);
+            d.putInt("rz_pura", 0);
+            sp.setHealth(VIDA_SEGURO);
+            sp.clearFire();
+            sp.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 100, 1));
+            sp.displayClientMessage(Component.literal("Un biceps dio la vida por vos"), true);
+            return true;
+        }
+        d.putInt("rz_grasa", 0);
+        d.putInt("rz_dec", 0);
+        d.putInt("rz_gacc", 0);
+        d.putInt("rz_pura", 0);
+        return false;
     }
 
     private static void asignarEquipo(ServerPlayer sp, String name) {
@@ -384,9 +459,15 @@ public final class Eventos {
                     || (hungerBefore < 0 && hungerAfter >= 20);
             data.putBoolean("rz_lleno", false);
             if (consumedWhileFull) {
+                // La grasa sube segun cuanto alimenta la comida: un plato fuerte ~1 nivel, bayas o alga seca, bastante menos.
+                var comida = used.get(DataComponents.FOOD);
+                int nutricion = comida == null ? 1 : Math.max(1, comida.nutrition());
+                int acumulado = data.getIntOr("rz_gacc", 0) + nutricion;
+                int sube = acumulado / NUTRICION_POR_GRASA;
+                data.putInt("rz_gacc", acumulado % NUTRICION_POR_GRASA);
                 int previousFat = data.getIntOr("rz_grasa", 0);
-                if (previousFat < MAX_GRASA) {
-                    data.putInt("rz_grasa", previousFat + 1);
+                if (sube > 0 && previousFat < MAX_GRASA) {
+                    data.putInt("rz_grasa", Math.min(MAX_GRASA, previousFat + sube));
                 }
             }
         }
