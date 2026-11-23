@@ -174,7 +174,7 @@ public final class ClientEventos {
             // Los primeros 4 son la zona útil (dorados); los últimos 3, panza pura (grasosos).
             boolean full = i < fat;
             // La grasa que está por bajar se vacía de abajo hacia arriba y titila al final.
-            int cutoff = (full && i == fat - 1) ? timer : 0;
+            int cutoff = (full && i == fat - 1) ? 1 + timer * 7 / 10 : 0;
             if (full && i == fat - 1 && timer >= 8 && (System.currentTimeMillis() / 500L) % 2L == 0L) cutoff = 9;
             drawFatIcon(graphics, right - i * 8, y, full, i >= 4, cutoff);
         }
@@ -188,7 +188,7 @@ public final class ClientEventos {
             if (i < muscle) {
                 drawRects(graphics, BICEP_FULL_RECTS, left + i * 8, my, 2, 0);
             } else if (i == muscle) {
-                drawRects(graphics, BICEP_FULL_RECTS, left + i * 8, my, fat > 0 ? 2 : 3, 9 - progress);
+                drawRects(graphics, BICEP_FULL_RECTS, left + i * 8, my, fat > 0 ? 2 : 3, 8 - (progress + 1) * 7 / 10);
             }
         }
     }

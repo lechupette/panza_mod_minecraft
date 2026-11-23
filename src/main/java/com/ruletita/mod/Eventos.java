@@ -257,6 +257,11 @@ public final class Eventos {
         if (pts >= PUNTOS_NIVEL) {
             pts = 0;
             musculo++;
+            if (grasa == GRASA_UTIL + 1) {
+                // Cruza de zona pura a util: el contador pasa a una escala mas corta; se reescala
+                // para que no baje otro nivel de grasa al instante.
+                d.putInt("rz_dec", d.getIntOr("rz_dec", 0) * DECAY_UTIL / DECAY_PURA);
+            }
             grasa--;
             d.putInt("rz_musc", musculo);
             d.putInt("rz_grasa", grasa);
@@ -270,9 +275,14 @@ public final class Eventos {
         MinecraftServer server = sp.level().getServer();
         if (server == null) return;
         Scoreboard scoreboard = server.getScoreboard();
+        PlayerTeam old = scoreboard.getPlayersTeam(sp.getScoreboardName());
         PlayerTeam team = scoreboard.getPlayerTeam(name);
         if (team == null) team = scoreboard.addPlayerTeam(name);
         scoreboard.addPlayerToTeam(sp.getScoreboardName(), team);
+        // Cada combinacion de estado crea un equipo: se borran los propios que quedan vacios.
+        if (old != null && old != team && old.getName().startsWith("rzb") && old.getPlayers().isEmpty()) {
+            scoreboard.removePlayerTeam(old);
+        }
     }
 
     /**
