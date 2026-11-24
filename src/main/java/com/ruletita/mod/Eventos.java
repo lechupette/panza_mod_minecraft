@@ -183,6 +183,11 @@ public final class Eventos {
         return current - last;
     }
 
+    /** Una fuente cuenta como activa en el minuto si llegó al 20 % de su tope (una piedra suelta no alcanza). */
+    private static boolean activa(CompoundTag d, String key, int tope) {
+        return d.getIntOr(key, 0) * 5 >= tope;
+    }
+
     /** Suma puntos a una fuente sin pasar su tope de la ventana actual. */
     private static int acumular(CompoundTag d, String key, int puntos, int tope) {
         int usado = d.getIntOr(key, 0);
@@ -228,9 +233,9 @@ public final class Eventos {
         if (ventana >= POLLS_VENTANA) {
             ventana = 0;
             // Cansancio por repetir: minutos seguidos usando una sola fuente (correr, minar o pegar).
-            int r = d.getIntOr("rz_cap_run", 0) > 0 ? 1 : 0;
-            int m = d.getIntOr("rz_cap_mine", 0) > 0 ? 1 : 0;
-            int h = d.getIntOr("rz_cap_hit", 0) > 0 ? 1 : 0;
+            int r = activa(d, "rz_cap_run", TOPE_CORRER) ? 1 : 0;
+            int m = activa(d, "rz_cap_mine", TOPE_MINAR) ? 1 : 0;
+            int h = activa(d, "rz_cap_hit", TOPE_PELEAR) ? 1 : 0;
             int fuente = (r + m + h == 1) ? (r == 1 ? 1 : (m == 1 ? 2 : 3)) : 0;
             int racha = fuente == 0 ? 0 : (fuente == d.getIntOr("rz_fat_src", 0) ? d.getIntOr("rz_fat_n", 0) + 1 : 1);
             d.putInt("rz_fat_src", fuente);
@@ -264,6 +269,7 @@ public final class Eventos {
                 musculo--;
                 d.putInt("rz_musc", musculo);
                 d.putInt("rz_mpts", 0);
+                d.putInt("rz_mrem", 0);
                 sp.displayClientMessage(Component.literal("La panza se esta comiendo tus musculos"), true);
             }
         } else {
@@ -275,8 +281,8 @@ public final class Eventos {
         if (musculo >= MAX_MUSCULO) return grasa;
 
         // Variedad: 2 fuentes en el mismo minuto rinden mas, 3 todavia mas. Repetir una sola cansa.
-        int activas = (d.getIntOr("rz_cap_run", 0) > 0 ? 1 : 0) + (d.getIntOr("rz_cap_mine", 0) > 0 ? 1 : 0)
-                + (d.getIntOr("rz_cap_hit", 0) > 0 ? 1 : 0);
+        int activas = (activa(d, "rz_cap_run", TOPE_CORRER) ? 1 : 0) + (activa(d, "rz_cap_mine", TOPE_MINAR) ? 1 : 0)
+                + (activa(d, "rz_cap_hit", TOPE_PELEAR) ? 1 : 0);
         int variedad = activas >= 3 ? 150 : (activas == 2 ? 125 : 100);
         int racha = d.getIntOr("rz_fat_n", 0);
         int cansancio = racha >= 10 ? 50 : (racha >= 5 ? 70 : 100);
@@ -284,9 +290,14 @@ public final class Eventos {
         // Sin grasa util no hay combustible; con mas grasa util rinde mas (40 %..100 %).
         int util = Math.min(grasa, GRASA_UTIL);
         if (util <= 0 || puntos <= 0) return grasa;
-        int pts = d.getIntOr("rz_mpts", 0) + puntos * variedad * cansancio * (2 + 2 * util) / 1000000;
+        // Factor = (variedad/100) * (cansancio/100) * ((2 + 2*util)/10). El resto se guarda para no perder
+        // los puntos chicos por truncado.
+        int total = puntos * variedad * cansancio * (2 + 2 * util) + d.getIntOr("rz_mrem", 0);
+        d.putInt("rz_mrem", total % 100000);
+        int pts = d.getIntOr("rz_mpts", 0) + total / 100000;
         if (pts >= PUNTOS_NIVEL) {
             pts = 0;
+            d.putInt("rz_mrem", 0);
             musculo++;
             if (grasa == GRASA_UTIL + 1) {
                 // Cruza de zona pura a util: el contador pasa a una escala mas corta; se reescala
@@ -320,6 +331,7 @@ public final class Eventos {
         if (musculo > 0 && !event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             d.putInt("rz_musc", musculo - 1);
             d.putInt("rz_mpts", 0);
+            d.putInt("rz_mrem", 0);
             d.putInt("rz_pura", 0);
             sp.setHealth(VIDA_SEGURO);
             sp.clearFire();

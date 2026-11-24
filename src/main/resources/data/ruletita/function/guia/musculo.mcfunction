@@ -14,7 +14,7 @@ tellraw @s ["",{text:"   Piedra y minerales rinden más; pasto y flores no suman
 tellraw @s ["",{text:"   Cada actividad tiene un tope por minuto: no se puede farmear una sola cosa.",color:"gray"}]
 tellraw @s ["",{text:"   Hacer dos cosas a la vez rinde +25 %, y tres, +50 %.",color:"white"}]
 tellraw @s ["",{text:"   Repetir una sola durante 5 minutos seguidos cansa un 30 %; 10 minutos, un 50 %.",color:"gray"}]
-tellraw @s ["",{text:"   Un nivel lleva media hora de juego activo, más o menos.",color:"gray"}]
+tellraw @s ["",{text:"   Un nivel lleva entre veinte minutos y una hora de juego activo: menos si juega variado, más si repite una sola cosa o anda con poca grasa.",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"3 · ",color:"gold",bold:true},{text:"El combustible",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   Cada nivel de músculo gasta 1 nivel de grasa.",color:"white"}]

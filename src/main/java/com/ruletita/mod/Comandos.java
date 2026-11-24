@@ -54,6 +54,7 @@ public final class Comandos {
                             CompoundTag d = p.getPersistentData();
                             d.putInt("rz_musc", valor);
                             d.putInt("rz_mpts", 0);
+                            d.putInt("rz_mrem", 0);
                             d.putInt("rz_pura", 0);
                             d.putInt("rz_warn", 0);
                         }))
@@ -122,7 +123,7 @@ public final class Comandos {
 
     private static int reiniciar(CommandContext<CommandSourceStack> c, ServerPlayer p) {
         CompoundTag d = p.getPersistentData();
-        for (String clave : new String[] {"rz_grasa", "rz_gacc", "rz_dec", "rz_musc", "rz_mpts", "rz_pura", "rz_warn", "rz_fat_n", "rz_fat_src"}) {
+        for (String clave : new String[] {"rz_grasa", "rz_gacc", "rz_dec", "rz_musc", "rz_mpts", "rz_mrem", "rz_pura", "rz_warn", "rz_fat_n", "rz_fat_src"}) {
             d.putInt(clave, 0);
         }
         c.getSource().sendSuccess(() -> Component.literal("Grasa y músculo de " + p.getName().getString() + " reiniciados."), true);
