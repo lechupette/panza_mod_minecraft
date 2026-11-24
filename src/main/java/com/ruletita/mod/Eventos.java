@@ -36,6 +36,7 @@ import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -103,6 +104,7 @@ public final class Eventos {
                                     int nivel = IntegerArgumentType.getInteger(context, "nivel");
                                     player.getPersistentData().putInt("rz_musc", nivel);
                                     player.getPersistentData().putInt("rz_mpts", 0);
+                                    player.getPersistentData().putInt("rz_pura", 0);
                                     context.getSource().sendSuccess(
                                             () -> Component.literal("Musculo: " + nivel + " / " + MAX_MUSCULO + "."), true);
                                     return 1;
@@ -122,6 +124,7 @@ public final class Eventos {
                         .executes(context -> {
                             ServerPlayer player = context.getSource().getPlayerOrException();
                             player.getPersistentData().putInt("rz_grasa", 0);
+                            player.getPersistentData().putInt("rz_gacc", 0);
                             context.getSource().sendSuccess(() -> Component.literal("Grasa restablecida."), true);
                             return 1;
                         })));
@@ -145,7 +148,8 @@ public final class Eventos {
         }
         d.putInt("rz_cd", cd);
 
-        int dec = d.getIntOr("rz_dec", 0) + 1;
+        // Sin grasa el contador no corre: la primera grasa que ganes empieza con el temporizador completo.
+        int dec = grasa > 0 ? d.getIntOr("rz_dec", 0) + 1 : 0;
         if (dec >= (grasa > GRASA_UTIL ? DECAY_PURA : DECAY_UTIL)) {
             dec = 0;
             if (grasa > 0) {
@@ -216,7 +220,6 @@ public final class Eventos {
         level.sendParticles(new DustParticleOptions(0xC9A227, 1.4f), sp.getX(), sp.getY() + 0.6, sp.getZ(), 5, 0.25, 0.12, 0.25, 0.01);
     }
 
-    /** Diferencia con la lectura anterior de una estadistica; 0 la primera vez o si se reinició. */
     /** Deja el modificador en el valor deseado (0 = sin modificador); se comprueba el real, no una marca guardada. */
     private static void aplicar(ServerPlayer sp, Holder<Attribute> atributo, Identifier id, double deseado,
                                 AttributeModifier.Operation operacion) {
@@ -232,6 +235,7 @@ public final class Eventos {
     private static Block[] bloquesPesados;
     private static int[] pesoBloques;
 
+    /** Diferencia con la lectura anterior de una estadistica; 0 la primera vez o si se reinició. */
     private static int delta(CompoundTag d, String key, int current) {
         int last = d.getIntOr(key, -1);
         d.putInt(key, current);
@@ -363,6 +367,12 @@ public final class Eventos {
      * 2 corazones. Void y /kill no se pueden frenar. Si moris de verdad, la grasa se pierde y el
      * musculo se conserva. El Totem de la inmortalidad actua antes, dentro de vanilla.
      */
+    /** Al reaparecer se copian los datos del jugador anterior (el musculo se conserva; la grasa ya se puso en 0 al morir). */
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (!(event.getEntity() instanceof ServerPlayer nuevo)) return;
+        nuevo.getPersistentData().merge(event.getOriginal().getPersistentData());
+    }
+
     public static boolean onLivingDeath(LivingDeathEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer sp)) return false;
         CompoundTag d = sp.getPersistentData();
@@ -373,7 +383,9 @@ public final class Eventos {
             d.putInt("rz_pura", 0);
             sp.setHealth(VIDA_SEGURO);
             sp.clearFire();
+            sp.setAirSupply(sp.getMaxAirSupply());
             sp.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 100, 1));
+            sp.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 0));
             sp.displayClientMessage(Component.literal("Un biceps dio la vida por vos"), true);
             return true;
         }

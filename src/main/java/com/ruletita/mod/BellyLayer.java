@@ -23,7 +23,7 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
     public void submit(PoseStack pose, SubmitNodeCollector collector, int light, AvatarRenderState state, float yRot, float xRot) {
         // La panza base no depende de tener grasa acumulada. Antes se retornaba con grasa 0,
         // por lo que el jugador no veía absolutamente nada al comenzar.
-        if (!Debug.belly) return;
+        if (!Debug.belly || state.isInvisible) return;
         float fat = ClientEventos.smoothFat(state.id);
         Identifier skin = state.skin.body().texturePath();
         ModelPart body = this.getParentModel().root().getChild("body");
@@ -52,6 +52,9 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
         float g = 0.10f + 0.50f * (musc / 3f);
         brazo(pose, collector, light, skin, this.getParentModel().root().getChild("right_arm"), 40, 16, slim, false, g);
         brazo(pose, collector, light, skin, this.getParentModel().root().getChild("left_arm"), 32, 48, slim, true, g);
+        // Capa de manga (si la skin la tiene): un poco mas grande, para que el bulto no tape mangas ni camperas.
+        brazo(pose, collector, light, skin, this.getParentModel().root().getChild("right_arm"), 40, 32, slim, false, g + 0.25f);
+        brazo(pose, collector, light, skin, this.getParentModel().root().getChild("left_arm"), 48, 48, slim, true, g + 0.25f);
     }
 
     private static final Identifier TONO = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "textures/entity/musculo.png");
