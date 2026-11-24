@@ -20,6 +20,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.Holder;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -60,6 +62,9 @@ public final class Eventos {
     private static final float VIDA_SEGURO = 4f;
     private static final int TOPE_CORRER = 400, TOPE_MINAR = 360, TOPE_PELEAR = 300, TOPE_SALTAR = 120;
     private static final Identifier MOD_VELOCIDAD = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "grasa");
+    private static final Identifier MOD_DANO = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "musculo_dano");
+    private static final Identifier MOD_MINADO = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "musculo_minado");
+    private static final Identifier MOD_RETROCESO = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "musculo_retroceso");
 
     private Eventos() { }
 
@@ -187,18 +192,17 @@ public final class Eventos {
             asignarEquipo(sp, "rzb" + nivel + "f" + grasa + "m" + musculo + "p" + Math.min(9, progreso) + "t" + temporizador + "w" + aviso);
         }
 
-        AttributeInstance inst = sp.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (inst != null) {
-            AttributeModifier actual = inst.getModifier(MOD_VELOCIDAD);
-            double deseado = -0.25 * grasa / MAX_GRASA;
-            boolean cambiar = grasa == 0 ? actual != null : (actual == null || actual.amount() != deseado);
-            if (cambiar) {
-                inst.removeModifier(MOD_VELOCIDAD);
-                if (grasa > 0) {
-                    inst.addPermanentModifier(new AttributeModifier(MOD_VELOCIDAD, deseado, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
-                }
-            }
-        }
+        // Grasa: lentitud hasta -25 %; cada nivel de musculo la reduce un 10 %.
+        aplicar(sp, Attributes.MOVEMENT_SPEED, MOD_VELOCIDAD,
+                -0.25 * grasa / MAX_GRASA * (1.0 - 0.1 * musculo), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        // Musculo (leves, crecientes): dano cuerpo a cuerpo +5 %/+10 % (niveles 2 y 3), minado +5 % por nivel,
+        // resistencia al retroceso +10 % por nivel.
+        aplicar(sp, Attributes.ATTACK_DAMAGE, MOD_DANO,
+                musculo >= 2 ? 0.05 * (musculo - 1) : 0.0, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        aplicar(sp, Attributes.BLOCK_BREAK_SPEED, MOD_MINADO,
+                0.05 * musculo, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        aplicar(sp, Attributes.KNOCKBACK_RESISTANCE, MOD_RETROCESO,
+                0.10 * musculo, AttributeModifier.Operation.ADD_VALUE);
     }
 
     private static void flatulencia(ServerPlayer sp) {
@@ -213,6 +217,18 @@ public final class Eventos {
     }
 
     /** Diferencia con la lectura anterior de una estadistica; 0 la primera vez o si se reinició. */
+    /** Deja el modificador en el valor deseado (0 = sin modificador); se comprueba el real, no una marca guardada. */
+    private static void aplicar(ServerPlayer sp, Holder<Attribute> atributo, Identifier id, double deseado,
+                                AttributeModifier.Operation operacion) {
+        AttributeInstance inst = sp.getAttribute(atributo);
+        if (inst == null) return;
+        AttributeModifier actual = inst.getModifier(id);
+        boolean cambiar = deseado == 0.0 ? actual != null : (actual == null || actual.amount() != deseado);
+        if (!cambiar) return;
+        inst.removeModifier(id);
+        if (deseado != 0.0) inst.addPermanentModifier(new AttributeModifier(id, deseado, operacion));
+    }
+
     private static Block[] bloquesPesados;
     private static int[] pesoBloques;
 
