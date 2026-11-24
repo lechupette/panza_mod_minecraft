@@ -9,7 +9,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[7.0.3,8)'
 }
 
-version = '2.0.0'
+version = '2.1.0'
 base { archivesName = 'ruletita' }
 group = 'com.ruletita'
 

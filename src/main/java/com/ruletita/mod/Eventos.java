@@ -338,6 +338,9 @@ public final class Eventos {
             sp.setAirSupply(sp.getMaxAirSupply());
             sp.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 100, 1));
             sp.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 0));
+            // Para que la causa no te mate de nuevo enseguida (marchitamiento, hambre) y se gasten todos los bíceps.
+            sp.removeEffect(MobEffects.WITHER);
+            if (sp.getFoodData().getFoodLevel() < 6) sp.getFoodData().setFoodLevel(6);
             sp.displayClientMessage(Component.literal("Un biceps dio la vida por vos"), true);
             return true;
         }
