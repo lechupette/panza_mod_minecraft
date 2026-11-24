@@ -76,7 +76,8 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
         float bx0 = left ? -1f : (slim ? -2f : -3f);
         float bx1 = bx0 + w;
         float x0 = bx0 - g, x1 = bx1 + g;
-        float y0 = -2f - g, y1 = 4.5f;
+        // La parte alta queda al ras del hombro: solo crece hacia los costados, adelante y atras.
+        float y0 = -1.85f, y1 = 4.5f;
         float z0 = -2f - g, z1 = 2f + g;
         float va = oy + d, vb = oy + d + 6.5f;
         float uF0 = ox + d, uF1 = ox + d + w;

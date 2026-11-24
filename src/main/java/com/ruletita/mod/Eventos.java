@@ -99,6 +99,7 @@ public final class Eventos {
         d.putInt("rz_dec", dec);
 
         grasa = entrenar(sp, d, grasa);
+        dec = d.getIntOr("rz_dec", dec);
         int musculo = d.getIntOr("rz_musc", 0);
         int progreso = d.getIntOr("rz_mpts", 0) * 10 / PUNTOS_NIVEL;
         int decayLimit = grasa > GRASA_UTIL ? DECAY_PURA : DECAY_UTIL;
@@ -301,17 +302,17 @@ public final class Eventos {
         return grasa;
     }
 
-    /**
-     * Seguro de vida: si un golpe te iba a matar y tenes musculo, un biceps se gasta y volves con
-     * 2 corazones. Void y /kill no se pueden frenar. Si moris de verdad, la grasa se pierde y el
-     * musculo se conserva. El Totem de la inmortalidad actua antes, dentro de vanilla.
-     */
     /** Al reaparecer se copian los datos del jugador anterior (el musculo se conserva; la grasa ya se puso en 0 al morir). */
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (!(event.getEntity() instanceof ServerPlayer nuevo)) return;
         nuevo.getPersistentData().merge(event.getOriginal().getPersistentData());
     }
 
+    /**
+     * Seguro de vida: si un golpe te iba a matar y tenes musculo, un biceps se gasta y volves con
+     * 2 corazones. Void y /kill no se pueden frenar. Si moris de verdad, la grasa se pierde y el
+     * musculo se conserva. El Totem de la inmortalidad actua antes, dentro de vanilla.
+     */
     public static boolean onLivingDeath(LivingDeathEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer sp)) return false;
         CompoundTag d = sp.getPersistentData();
@@ -349,10 +350,6 @@ public final class Eventos {
         }
     }
 
-    /**
-     * Permite empezar a comer cualquier alimento con la barra de hambre llena (vanilla lo impide).
-     * Solo en servidor; los alimentos "siempre comestibles" siguen el camino normal.
-     */
     /** El aldeano granjero vende cerezas de café en el nivel de novato. */
     public static void onVillagerTrades(VillagerTradesEvent event) {
         if (!event.getType().toString().contains("farmer")) return;
@@ -375,6 +372,10 @@ public final class Eventos {
         return custom != null && custom.copyTag().contains("kuadro");
     }
 
+    /**
+     * Kuadro en la mano: abre el selector de medida. Con otro alimento y la barra de hambre llena,
+     * permite empezar a comer (vanilla lo impide); los "siempre comestibles" siguen el camino normal.
+     */
     public static boolean onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if (!(event.getEntity() instanceof ServerPlayer sp)) return false;
         ItemStack stack = event.getItemStack();
