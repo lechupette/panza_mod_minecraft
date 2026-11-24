@@ -6,5 +6,6 @@ execute if score @s panza matches 11 run function ruletita:guia/grasa
 execute if score @s panza matches 12 run function ruletita:guia/hambre
 execute if score @s panza matches 13 run function ruletita:guia/cafe
 execute if score @s panza matches 14 run function ruletita:guia/frascos
+execute if score @s panza matches 15 run function ruletita:guia/musculo
 scoreboard players set @s panza 0
 scoreboard players enable @s panza

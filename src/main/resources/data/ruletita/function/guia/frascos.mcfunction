@@ -19,4 +19,4 @@ tellraw @s ["",{text:"   Para recuperarlo, rompa el recipiente y recoja el objet
 tellraw @s ""
 tellraw @s ["",{text:" ☺ ",color:"green"},{text:"Consejo: ",color:"green",bold:true},{text:"no golpee el frasco, joputa. El pez ya sufrió bastante",color:"gray",italic:true}]
 tellraw @s ["",{text:"▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",color:"dark_gray"}]
-tellraw @s ["",{text:" ",color:"white"},{text:"◄ Anterior",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 13"}},{text:"   ",color:"white"},{text:"☼ Índice",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}},{text:"   ",color:"white"}]
+tellraw @s ["",{text:" ",color:"white"},{text:"◄ Anterior",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 13"}},{text:"   ",color:"white"},{text:"☼ Índice",color:"yellow",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 10"}},{text:"   ",color:"white"},{text:"Siguiente ►",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 15"}}]

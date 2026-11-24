@@ -9,8 +9,10 @@ tellraw @s ["",{text:"   Alimentación  ",color:"white"},{text:"♥♥♥♥♥�
 tellraw @s ["",{text:"   Grasa       ",color:"yellow"},{text:"♥♥♥♥",color:"gold"},{text:"♥♥♥",color:"#8A6A10"},{text:"  ← sobre la barra",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"2 · ",color:"gold",bold:true},{text:"Cómo se acumula",color:"yellow",bold:true}]
-tellraw @s ["",{text:"   Con la barra completa, cada alimento suma 1 nivel de grasa. Sí, joputa, comer de más tiene consecuencias.",color:"white"}]
-tellraw @s ["",{text:"   Con el tiempo la grasa baja. Despacio. Muy despacio.",color:"gray"}]
+tellraw @s ["",{text:"   Con la barra completa, cada comida suma grasa según cuánto alimenta: un plato fuerte, casi un nivel; unas bayas, bastante menos. Sí, joputa, comer de más tiene consecuencias.",color:"white"}]
+tellraw @s ["",{text:"   Los 4 primeros niveles son grasa útil (dorados): sirven para ganar músculo. Los 3 últimos son panza pura (grasosos): solo engordan.",color:"gray"}]
+tellraw @s ["",{text:"   Con el tiempo la grasa baja: un nivel cada 15 minutos en la zona útil y más despacio en la pura. El icono que está por bajar se vacía y titila.",color:"gray"}]
+tellraw @s ["",{text:"   Si se muere, la grasa se pierde.",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"3 · ",color:"gold",bold:true},{text:"Alimento graso: pollo con carne",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   a ► ",color:"gold",bold:true},{text:"Mesa de trabajo: 1 pollo crudo + 1 carne cruda (res, cerdo o cordero).",color:"white"}]
@@ -29,6 +31,7 @@ tellraw @s ["",{text:"   7  ",color:"gold",bold:true},{text:"♥♥♥♥",color
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"5 · ",color:"gold",bold:true},{text:"Movimiento",color:"yellow",bold:true}]
 tellraw @s ["",{text:"   Cada nivel reduce un poco la marcha. Correr con siete niveles es un acto de fe.",color:"white"}]
+tellraw @s ["",{text:"   El músculo alivia esa lentitud. ",color:"gray"},{text:"Ver lámina 05",color:"aqua",underlined:true,click_event:{action:"run_command",command:"/trigger panza set 15"}}]
 tellraw @s ""
 tellraw @s ["",{text:" ☺ ",color:"green"},{text:"Consejo: ",color:"green",bold:true},{text:"el Departamento no recomienda comer pollo hasta reventar, joputa",color:"gray",italic:true},{text:" XD",color:"yellow",bold:true}]
 tellraw @s ["",{text:"▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",color:"dark_gray"}]
