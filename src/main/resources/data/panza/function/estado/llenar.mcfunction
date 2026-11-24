@@ -1,1 +1,1 @@
-panza hambre 20
+panza hambre set 20

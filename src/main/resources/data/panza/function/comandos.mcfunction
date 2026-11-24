@@ -27,7 +27,10 @@ tellraw @s ["",{text:" ► ",color:"gold"},{text:"function panza:test/cafe",colo
 tellraw @s ["",{text:" ► ",color:"gold"},{text:"function panza:test/frascos",color:"aqua",click_event:{action:"run_command",command:"/function panza:test/frascos"},hover_event:{action:"show_text",value:{text:"Ejecutar"}}},{text:"  frascos",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"Comandos directos",color:"yellow",bold:true}]
-tellraw @s ["",{text:"   /panza hambre <1-20>  ·  /panza grasa <1-7>  ·  /panza musculo <0-3>  ·  /panza estado",color:"gray"}]
-tellraw @s ["",{text:"   /panza limpiar_grasa",color:"gray"}]
+tellraw @s ["",{text:"   /panza estado [jugador]",color:"gray"}]
+tellraw @s ["",{text:"   /panza grasa set|add|clear [0-7] [jugador]",color:"gray"}]
+tellraw @s ["",{text:"   /panza musculo set|add|clear [0-3] [jugador]",color:"gray"}]
+tellraw @s ["",{text:"   /panza hambre set|add [0-20] [jugador]",color:"gray"}]
+tellraw @s ["",{text:"   /panza reiniciar [jugador]",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:"▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",color:"dark_gray"}]

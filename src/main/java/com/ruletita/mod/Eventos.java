@@ -43,15 +43,15 @@ import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 
 /** Logica de servidor: alimentacion, grasa, cafe, insomnio y comandos de prueba. */
 public final class Eventos {
-    private static final int MAX_GRASA = 7;
+    static final int MAX_GRASA = 7;
     // Grasa 1..4 = util (alimenta el musculo); 5..7 = panza pura.
-    private static final int GRASA_UTIL = 4;
+    static final int GRASA_UTIL = 4;
     // Cada cuantos ticks baja 1 nivel de grasa (15 min en zona util, mas lento en zona pura).
     private static final int DECAY_UTIL = 18000;
     private static final int DECAY_PURA = 30000;
     // Musculo: niveles y puntos de entrenamiento por nivel (~30 min de juego activo).
-    private static final int MAX_MUSCULO = 3;
-    private static final int PUNTOS_NIVEL = 9000;
+    static final int MAX_MUSCULO = 3;
+    static final int PUNTOS_NIVEL = 9000;
     // Tope de puntos por minuto y por fuente, para que no se pueda farmear una sola cosa.
     private static final int POLLS_VENTANA = 60;
     // Puntos de nutricion de comida (estando lleno) que hacen falta para 1 nivel de grasa.
@@ -68,67 +68,6 @@ public final class Eventos {
     private static final Identifier MOD_RETROCESO = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "musculo_retroceso");
 
     private Eventos() { }
-
-    public static void registerCommands(RegisterCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("panza")
-                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .then(Commands.literal("hambre")
-                        .then(Commands.argument("puntos", IntegerArgumentType.integer(1, 20))
-                                .executes(context -> {
-                                    ServerPlayer player = context.getSource().getPlayerOrException();
-                                    int points = IntegerArgumentType.getInteger(context, "puntos");
-                                    player.getFoodData().eat(points, 0.0F);
-                                    context.getSource().sendSuccess(
-                                            () -> Component.literal("Hambre aumentada en " + points + " puntos."),
-                                            true);
-                                    return 1;
-                                })))
-                .then(Commands.literal("grasa")
-                        .then(Commands.argument("niveles", IntegerArgumentType.integer(1, 7))
-                                .executes(context -> {
-                                    ServerPlayer player = context.getSource().getPlayerOrException();
-                                    int amount = IntegerArgumentType.getInteger(context, "niveles");
-                                    CompoundTag data = player.getPersistentData();
-                                    int before = Math.max(0, data.getIntOr("rz_grasa", 0));
-                                    int after = Math.min(MAX_GRASA, before + amount);
-                                    data.putInt("rz_grasa", after);
-                                    context.getSource().sendSuccess(
-                                            () -> Component.literal("Grasa: " + after + " / " + MAX_GRASA + "."),
-                                            true);
-                                    return 1;
-                                })))
-                .then(Commands.literal("musculo")
-                        .then(Commands.argument("nivel", IntegerArgumentType.integer(0, MAX_MUSCULO))
-                                .executes(context -> {
-                                    ServerPlayer player = context.getSource().getPlayerOrException();
-                                    int nivel = IntegerArgumentType.getInteger(context, "nivel");
-                                    player.getPersistentData().putInt("rz_musc", nivel);
-                                    player.getPersistentData().putInt("rz_mpts", 0);
-                                    player.getPersistentData().putInt("rz_pura", 0);
-                                    context.getSource().sendSuccess(
-                                            () -> Component.literal("Musculo: " + nivel + " / " + MAX_MUSCULO + "."), true);
-                                    return 1;
-                                })))
-                .then(Commands.literal("estado")
-                        .executes(context -> {
-                            ServerPlayer player = context.getSource().getPlayerOrException();
-                            CompoundTag data = player.getPersistentData();
-                            String texto = "Nivel visual: " + data.getIntOr("rz_nivel", 0) + " / " + (10 + MAX_GRASA)
-                                    + " · Grasa: " + data.getIntOr("rz_grasa", 0) + " / " + MAX_GRASA
-                                    + " · Musculo: " + data.getIntOr("rz_musc", 0) + " / " + MAX_MUSCULO
-                                    + " (progreso " + data.getIntOr("rz_mpts", 0) + " / " + PUNTOS_NIVEL + ")";
-                            context.getSource().sendSuccess(() -> Component.literal(texto), false);
-                            return 1;
-                        }))
-                .then(Commands.literal("limpiar_grasa")
-                        .executes(context -> {
-                            ServerPlayer player = context.getSource().getPlayerOrException();
-                            player.getPersistentData().putInt("rz_grasa", 0);
-                            player.getPersistentData().putInt("rz_gacc", 0);
-                            context.getSource().sendSuccess(() -> Component.literal("Grasa restablecida."), true);
-                            return 1;
-                        })));
-    }
 
     public static void onPlayerTick(TickEvent.PlayerTickEvent.Post event) {
         if (!Debug.serverTick) return;

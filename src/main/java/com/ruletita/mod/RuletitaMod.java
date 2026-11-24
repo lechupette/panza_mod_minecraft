@@ -149,7 +149,7 @@ public final class RuletitaMod {
         SOUNDS.register(bus);
         TABS.register(bus);
 
-        RegisterCommandsEvent.BUS.addListener(Eventos::registerCommands);
+        RegisterCommandsEvent.BUS.addListener(Comandos::register);
         TickEvent.PlayerTickEvent.Post.BUS.addListener(Eventos::onPlayerTick);
         LivingEntityUseItemEvent.Start.BUS.addListener(Eventos::onUseStart);
         LivingEntityUseItemEvent.Finish.BUS.addListener(Eventos::onUseFinish);

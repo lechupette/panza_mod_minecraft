@@ -1,1 +1,1 @@
-panza grasa 7
+panza grasa set 7

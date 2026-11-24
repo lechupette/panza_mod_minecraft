@@ -1,1 +1,1 @@
-panza limpiar_grasa
+panza grasa clear
