@@ -32,17 +32,19 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
         // transforma la masa base y la util: menos panza hacia adelante, mas ancho de torso.
         final Forma forma = Forma.de(fat, musc / 3f);
         final float t = forma.t();
-        pose.pushPose();
-        body.translateAndRotate(pose);
-        collector.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(skin), (p, vc) -> draw(p, vc, light, forma));
-        pose.popPose();
+        // Sin grasa no hay panza: cuerpo normal. La base aparece apenas hay grasa (se funde de 0 a 1).
+        if (t > 0.02f) {
+            pose.pushPose();
+            body.translateAndRotate(pose);
+            collector.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(skin), (p, vc) -> draw(p, vc, light, forma));
+            pose.popPose();
+        }
 
         if (musc <= 0) return;
 
         // Tono: la masa de la zona util (grasa 1 a 4) se marca con el musculo; la de la zona pura
         // sigue blanda. Con mas grasa pura, la parte tonificada es una fraccion menor del volumen.
-        float tUtil = 0.25f + 0.75f * Math.min(fat, 4f) / 7f;
-        float tono = Math.max(0f, Math.min(1f, (musc / 3f) * (tUtil / t)));
+        float tono = Math.max(0f, Math.min(1f, (musc / 3f) * forma.util()));
         final int alpha = (int) (255f * tono);
         pose.pushPose();
         body.translateAndRotate(pose);
@@ -64,18 +66,20 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
      * atras; e = salida base. Con musculo, la masa base y la util se vuelven firmes (menos panza, mas
      * ancho) y la masa pura (grasa 5 a 7) sigue blanda. Con musculo 0 da las medidas de siempre.
      */
-    private record Forma(float t, float f, float l, float b, float e) {
+    private record Forma(float t, float s, float util, float f, float l, float b, float e) {
         static Forma de(float fat, float m) {
             float g = Math.max(0f, Math.min(fat, 7f));
-            float tf = 0.25f + 0.75f * Math.min(g, 4f) / 7f;
+            // s: presencia de la base; 0 sin grasa y 1 desde el primer nivel.
+            float s = Math.min(g, 1f);
+            float tf = 0.25f * s + 0.75f * Math.min(g, 4f) / 7f;
             float tp = 0.75f * Math.max(g - 4f, 0f) / 7f;
             float t = tf + tp;
-            float firmeza = m * tf / t;
-            return new Forma(t,
-                    tf * (1f - 0.65f * m) + tp,
+            float util = t > 0f ? tf / t : 1f;
+            return new Forma(t, s, util,
+                    tf * (1f - 0.50f * m) + tp,
                     tf * (1f + 0.40f * m) + tp,
                     tf * (1f - 0.40f * m) + tp,
-                    0.7f * (1f - 0.7f * firmeza));
+                    0.7f * s * (1f - 0.7f * m * util));
         }
     }
 
@@ -125,8 +129,8 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
         float va = vOf(y0), vb = vOf(y1);
         q(p, vc, light, 0, 0, -1, x0, y0, z0, 20, va, x1, y0, z0, 28, va, x1, y1, z0, 28, vb, x0, y1, z0, 20, vb);
         float by0 = 8.6f, by1 = 13.4f + 0.8f * t;
-        float bz1 = 2f + e + 1.2f + 3.8f * m.b() + 0.03f;
-        float bx = 4.4f + 1.2f * m.l();
+        float bz1 = 2f + e + 1.2f * m.s() + 3.8f * m.b() + 0.03f;
+        float bx = 4f + 0.4f * m.s() + 1.2f * m.l();
         float nva = Math.max(26f, vOf(by0)), nvb = Math.min(31.5f, vOf(by1));
         q(p, vc, light, 0, 0, 1, -0.1f, by0, bz1, 33, nva, -bx, by0, bz1, 39, nva, -bx, by1, bz1, 39, nvb, -0.1f, by1, bz1, 33, nvb);
         q(p, vc, light, 0, 0, 1, bx, by0, bz1, 33, nva, 0.1f, by0, bz1, 39, nva, 0.1f, by1, bz1, 39, nvb, bx, by1, bz1, 33, nvb);
@@ -142,8 +146,8 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
         float z0 = -(2f + e + 5.5f * m.f()), z1 = 2f + e;
         torso(p, vc, light, x0, y0, z0, x1, y1, z1);
         float by0 = 8.6f, by1 = 13.4f + 0.8f * t;
-        float bz0 = 2f + e - 0.05f, bz1 = 2f + e + 1.2f + 3.8f * m.b();
-        float bx = 4.4f + 1.2f * m.l();
+        float bz0 = 2f + e - 0.05f, bz1 = 2f + e + 1.2f * m.s() + 3.8f * m.b();
+        float bx = 4f + 0.4f * m.s() + 1.2f * m.l();
         nalga(p, vc, light, -bx, -0.1f, by0, by1, bz0, bz1);
         nalga(p, vc, light, 0.1f, bx, by0, by1, bz0, bz1);
     }
