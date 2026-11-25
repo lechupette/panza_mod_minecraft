@@ -36,7 +36,7 @@ tellraw @s ["",{text:"   Veinte minutos en panza pura (5 a 7) sin entrenar y se 
 tellraw @s ["",{text:"   A los quince minutos el último bíceps titila. Entrenar frena la cuenta.",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"7 · ",color:"gold",bold:true},{text:"Cómo se ve",color:"yellow",bold:true}]
-tellraw @s ["",{text:"   Con la grasa útil, la panza marca pectorales y abdominales, las nalgas se tonifican y los brazos crecen.",color:"white"}]
+tellraw @s ["",{text:"   Con músculo, la panza se aplana y marca pectorales y abdominales, el torso se ensancha, las nalgas se tonifican y los brazos crecen.",color:"white"}]
 tellraw @s ["",{text:"   La grasa pura sigue blanda: se puede ser fuerte y panzón a la vez.",color:"gray"}]
 tellraw @s ""
 tellraw @s ["",{text:" ♦ ",color:"gold"},{text:"8 · ",color:"gold",bold:true},{text:"Si se muere",color:"yellow",bold:true}]

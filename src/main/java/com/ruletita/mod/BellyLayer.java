@@ -27,14 +27,16 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
         float fat = ClientEventos.smoothFat(state.id);
         Identifier skin = state.skin.body().texturePath();
         ModelPart body = this.getParentModel().root().getChild("body");
-        // Volumen base visible (0.25) + hasta 0.75 adicional con los 7 niveles de reserva.
-        final float t = 0.25f + 0.75f * Math.max(0f, Math.min(fat / 7f, 1f));
+        int musc = ClientEventos.muscleOf(state.id);
+        // Volumen base visible (0.25) + hasta 0.75 adicional con los 7 niveles de reserva. El musculo
+        // transforma la masa base y la util: menos panza hacia adelante, mas ancho de torso.
+        final Forma forma = Forma.de(fat, musc / 3f);
+        final float t = forma.t();
         pose.pushPose();
         body.translateAndRotate(pose);
-        collector.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(skin), (p, vc) -> draw(p, vc, light, t));
+        collector.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(skin), (p, vc) -> draw(p, vc, light, forma));
         pose.popPose();
 
-        int musc = ClientEventos.muscleOf(state.id);
         if (musc <= 0) return;
 
         // Tono: la masa de la zona util (grasa 1 a 4) se marca con el musculo; la de la zona pura
@@ -44,7 +46,7 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
         final int alpha = (int) (255f * tono);
         pose.pushPose();
         body.translateAndRotate(pose);
-        collector.submitCustomGeometry(pose, RenderTypes.entityTranslucent(TONO), (p, vc) -> drawTono(p, vc, light, t, alpha));
+        collector.submitCustomGeometry(pose, RenderTypes.entityTranslucent(TONO), (p, vc) -> drawTono(p, vc, light, forma, alpha));
         pose.popPose();
 
         // Brazos: crece el musculo (el brazo no muestra grasa). Bulto en el brazo superior.
@@ -55,6 +57,26 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
         // Capa de manga (si la skin la tiene): un poco mas grande, para que el bulto no tape mangas ni camperas.
         brazo(pose, collector, light, skin, this.getParentModel().root().getChild("right_arm"), 40, 32, slim, false, g + 0.25f);
         brazo(pose, collector, light, skin, this.getParentModel().root().getChild("left_arm"), 48, 48, slim, true, g + 0.25f);
+    }
+
+    /**
+     * Medidas de la panza. t = volumen total; f, l, b = factores hacia adelante, a los costados y hacia
+     * atras; e = salida base. Con musculo, la masa base y la util se vuelven firmes (menos panza, mas
+     * ancho) y la masa pura (grasa 5 a 7) sigue blanda. Con musculo 0 da las medidas de siempre.
+     */
+    private record Forma(float t, float f, float l, float b, float e) {
+        static Forma de(float fat, float m) {
+            float g = Math.max(0f, Math.min(fat, 7f));
+            float tf = 0.25f + 0.75f * Math.min(g, 4f) / 7f;
+            float tp = 0.75f * Math.max(g - 4f, 0f) / 7f;
+            float t = tf + tp;
+            float firmeza = m * tf / t;
+            return new Forma(t,
+                    tf * (1f - 0.65f * m) + tp,
+                    tf * (1f + 0.40f * m) + tp,
+                    tf * (1f - 0.40f * m) + tp,
+                    0.7f * (1f - 0.7f * firmeza));
+        }
     }
 
     private static final Identifier TONO = Identifier.fromNamespaceAndPath(RuletitaMod.MODID, "textures/entity/musculo.png");
@@ -94,17 +116,17 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
     }
 
     // Marcas de pectorales, abdominales y nalgas, translucidas, apenas por fuera de la panza.
-    private static void drawTono(PoseStack.Pose p, VertexConsumer vc, int light, float t, int alpha) {
+    private static void drawTono(PoseStack.Pose p, VertexConsumer vc, int light, Forma m, int alpha) {
         alphaActual = alpha;
-        final float e = 0.7f;
-        float x0 = -(4f + e + 2.0f * t), x1 = 4f + e + 2.0f * t;
+        final float e = m.e(), t = m.t();
+        float x0 = -(4f + e + 2.0f * m.l()), x1 = 4f + e + 2.0f * m.l();
         float y0 = 3.5f, y1 = 12f + 0.6f * t;
-        float z0 = -(2f + e + 5.5f * t) - 0.03f;
+        float z0 = -(2f + e + 5.5f * m.f()) - 0.03f;
         float va = vOf(y0), vb = vOf(y1);
         q(p, vc, light, 0, 0, -1, x0, y0, z0, 20, va, x1, y0, z0, 28, va, x1, y1, z0, 28, vb, x0, y1, z0, 20, vb);
         float by0 = 8.6f, by1 = 13.4f + 0.8f * t;
-        float bz1 = 2f + e + 1.2f + 3.8f * t + 0.03f;
-        float bx = 4.4f + 1.2f * t;
+        float bz1 = 2f + e + 1.2f + 3.8f * m.b() + 0.03f;
+        float bx = 4.4f + 1.2f * m.l();
         float nva = Math.max(26f, vOf(by0)), nvb = Math.min(31.5f, vOf(by1));
         q(p, vc, light, 0, 0, 1, -0.1f, by0, bz1, 33, nva, -bx, by0, bz1, 39, nva, -bx, by1, bz1, 39, nvb, -0.1f, by1, bz1, 33, nvb);
         q(p, vc, light, 0, 0, 1, bx, by0, bz1, 33, nva, 0.1f, by0, bz1, 39, nva, 0.1f, by1, bz1, 39, nvb, bx, by1, bz1, 33, nvb);
@@ -112,16 +134,16 @@ public class BellyLayer<M extends EntityModel<? super AvatarRenderState>> extend
     }
 
     // Todo en pixeles del modelo (1 bloque = 16 px). Frente = -Z.
-    private static void draw(PoseStack.Pose p, VertexConsumer vc, int light, float t) {
+    private static void draw(PoseStack.Pose p, VertexConsumer vc, int light, Forma m) {
         alphaActual = 255;
-        final float e = 0.7f;
-        float x0 = -(4f + e + 2.0f * t), x1 = 4f + e + 2.0f * t;
+        final float e = m.e(), t = m.t();
+        float x0 = -(4f + e + 2.0f * m.l()), x1 = 4f + e + 2.0f * m.l();
         float y0 = 3.5f, y1 = 12f + 0.6f * t;
-        float z0 = -(2f + e + 5.5f * t), z1 = 2f + e;
+        float z0 = -(2f + e + 5.5f * m.f()), z1 = 2f + e;
         torso(p, vc, light, x0, y0, z0, x1, y1, z1);
         float by0 = 8.6f, by1 = 13.4f + 0.8f * t;
-        float bz0 = 2f + e - 0.05f, bz1 = 2f + e + 1.2f + 3.8f * t;
-        float bx = 4.4f + 1.2f * t;
+        float bz0 = 2f + e - 0.05f, bz1 = 2f + e + 1.2f + 3.8f * m.b();
+        float bx = 4.4f + 1.2f * m.l();
         nalga(p, vc, light, -bx, -0.1f, by0, by1, bz0, bz1);
         nalga(p, vc, light, 0.1f, bx, by0, by1, bz0, bz1);
     }
